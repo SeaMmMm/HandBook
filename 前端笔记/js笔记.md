@@ -841,3 +841,196 @@ alert(clone.sizes.width); // 51，能从另外一个获取到变更后的结果
 ```
 
 为了解决这个问题，并让 `user` 和 `clone` 成为两个真正独立的对象，我们应该使用一个拷贝循环来检查 `user[key]` 的每个值，如果它是一个对象，那么也复制它的结构。这就是所谓的“深拷贝”。
+
+
+
+# 构造器模式测试: `new.target`
+
+在一个函数内部，我们可以使用 `new.target` 属性来检查它是否被使用 `new` 进行调用了。
+
+对于常规调用，它为 undefined，对于使用 `new` 的调用，则等于该函数：
+
+```javascript
+function User() {
+  alert(new.target);
+}
+
+// 不带 "new"：
+User(); // undefined
+
+// 带 "new"：
+new User(); // function User { ... }
+```
+
+它可以被用在函数内部，来判断该函数是被通过 `new` 调用的“构造器模式”，还是没被通过 `new` 调用的“常规模式”。
+
+我们也可以让 `new` 调用和常规调用做相同的工作，像这样：
+
+```javascript
+function User(name) {
+  if (!new.target) { // 如果你没有通过 new 运行我
+    return new User(name); // ……我会给你添加 new
+  }
+
+  this.name = name;
+}
+
+let john = User("John"); // 将调用重定向到新用户
+alert(john.name); // John
+```
+
+这种方法有时被用在库中以使语法更加灵活。这样人们在调用函数时，无论是否使用了 `new`，程序都能工作。
+
+不过，到处都使用它并不是一件好事，因为省略了 `new` 使得很难观察到代码中正在发生什么。而通过 `new` 我们都可以知道这创建了一个新对象。
+
+
+
+## 关于构造器的总结
+
+- 构造函数，或简称构造器，就是常规函数，但大家对于构造器有个共同的约定，就是其命名首字母要大写。
+- 构造函数只能使用 `new` 来调用。这样的调用意味着在开始时创建了空的 `this`，并在最后返回填充了值的 `this`。
+
+我们可以使用构造函数来创建多个类似的对象。
+
+JavaScript 为许多内建的对象提供了构造函数：比如日期 `Date`、集合 `Set` 以及其他我们计划学习的内容。
+
+
+
+# 可选链的变体`?.() ?.[]`
+
+可选链 `?.` 不是一个运算符，而是一个特殊的语法结构。它还可以与函数和方括号一起使用。
+
+例如，将 `?.()` 用于调用一个可能不存在的函数。
+
+在下面这段代码中，有些用户具有 `admin` 方法，而有些没有：
+
+```javascript
+let userAdmin = {
+  admin() {
+    alert("I am admin");
+  }
+};
+
+let userGuest = {};
+
+userAdmin.admin?.(); // I am admin
+
+userGuest.admin?.(); // 啥都没发生（没有这样的方法）
+```
+
+在这两行代码中，我们首先使用点符号（`userAdmin.admin`）来获取 `admin` 属性，因为我们假定对象 `userAdmin` 存在，因此可以安全地读取它。
+
+然后 `?.()` 会检查它左边的部分：如果 `admin` 函数存在，那么就调用运行它（对于 `userAdmin`）。否则（对于 `userGuest`）运算停止，没有报错。
+
+如果我们想使用方括号 `[]` 而不是点符号 `.` 来访问属性，语法 `?.[]` 也可以使用。跟前面的例子类似，它允许从一个可能不存在的对象上安全地读取属性。
+
+```javascript
+let key = "firstName";
+
+let user1 = {
+  firstName: "John"
+};
+
+let user2 = null;
+
+alert( user1?.[key] ); // John
+alert( user2?.[key] ); // undefined
+```
+
+此外，我们还可以将 `?.` 跟 `delete` 一起使用：
+
+```javascript
+delete user?.name; // 如果 user 存在，则删除 user.name
+```
+
+> **我们可以使用 `?.` 来安全地读取或删除，但不能写入**
+>
+> 可选链 `?.` 不能用在赋值语句的左侧。
+>
+> 例如：
+>
+> ```javascript
+> let user = null;
+> 
+> user?.name = "John"; // Error，不起作用
+> // 因为它在计算的是：undefined = "John"
+> ```
+
+
+
+## 可选链总结
+
+可选链 `?.` 语法有三种形式：
+
+1. `obj?.prop` —— 如果 `obj` 存在则返回 `obj.prop`，否则返回 `undefined`。
+2. `obj?.[prop]` —— 如果 `obj` 存在则返回 `obj[prop]`，否则返回 `undefined`。
+3. `obj.method?.()` —— 如果 `obj.method` 存在则调用 `obj.method()`，否则返回 `undefined`。
+
+正如我们所看到的，这些语法形式用起来都很简单直接。`?.` 检查左边部分是否为 `null/undefined`，如果不是则继续运算。
+
+`?.` 链使我们能够安全地访问嵌套属性。
+
+但是，我们应该谨慎地使用 `?.`，根据我们的代码逻辑，仅在当左侧部分不存在也可接受的情况下使用为宜。以保证在代码中有编程上的错误出现时，也不会对我们隐藏。
+
+
+
+# symbol 类型
+
+## symbol
+
+“symbol” 值表示唯一的标识符。
+
+可以使用 `Symbol()` 来创建这种类型的值：
+
+```javascript
+let id = Symbol();
+```
+
+创建时，我们可以给 symbol 一个描述（也称为 symbol 名），这在代码调试时非常有用：
+
+```javascript
+// id 是描述为 "id" 的 symbol
+let id = Symbol("id");
+```
+
+symbol 保证是唯一的。即使我们创建了许多具有相同描述的 symbol，它们的值也是不同。描述只是一个标签，不影响任何东西。
+
+例如，这里有两个描述相同的 symbol —— 它们不相等：
+
+```javascript
+let id1 = Symbol("id");
+let id2 = Symbol("id");
+
+alert(id1 == id2); // false
+```
+
+如果你熟悉 Ruby 或者其他有 “symbol” 的语言 —— 别被误导。JavaScript 的 symbol 是不同的。
+
+所以，总而言之，symbol 是带有可选描述的“原始唯一值”。让我们看看我们可以在哪里使用它们。
+
+> ==symbol 不会被自动转换为字符串==
+>
+> JavaScript 中的大多数值都支持字符串的隐式转换。例如，我们可以 `alert` 任何值，都可以生效。symbol 比较特殊，它不会被自动转换。
+>
+> 例如，这个 `alert` 将会提示出错：
+>
+> ```javascript
+> let id = Symbol("id");
+> alert(id); // 类型错误：无法将 symbol 值转换为字符串。
+> ```
+>
+> 这是一种防止混乱的“语言保护”，因为字符串和 symbol 有本质上的不同，不应该意外地将它们转换成另一个。
+>
+> 如果我们真的想显示一个 symbol，我们需要在它上面调用 `.toString()`，如下所示：
+>
+> ```javascript
+> let id = Symbol("id");
+> alert(id.toString()); // Symbol(id)，现在它有效了
+> ```
+>
+> 或者获取 `symbol.description` 属性，只显示描述（description）：
+>
+> ```javascript
+> let id = Symbol("id");
+> alert(id.description); // id
+> ```
