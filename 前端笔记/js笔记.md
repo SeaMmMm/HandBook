@@ -1522,3 +1522,282 @@ alert(obj + 2); // 22（"2" + 2）被转换为原始值字符串 => 级联
 所有这些方法都必须返回一个原始值才能工作（如果已定义）。
 
 在实际使用中，通常只实现 `obj.toString()` 作为字符串转换的“全能”方法就足够了，该方法应该返回对象的“人类可读”表示，用于日志记录或调试。
+
+
+
+# 数字类型
+
+## toString(base)
+
+方法 `num.toString(base)` 返回在给定 `base` 进制数字系统中 `num` 的字符串表示形式。
+
+举个例子：
+
+```javascript
+let num = 255;
+
+alert( num.toString(16) );  // ff
+alert( num.toString(2) );   // 11111111
+```
+
+`base` 的范围可以从 `2` 到 `36`。默认情况下是 `10`。
+
+常见的用例如下：
+
+- **base=16** 用于十六进制颜色，字符编码等，数字可以是 `0..9` 或 `A..F`。
+
+- **base=2** 主要用于调试按位操作，数字可以是 `0` 或 `1`。
+
+- **base=36** 是最大进制，数字可以是 `0..9` 或 `A..Z`。所有拉丁字母都被用于了表示数字。对于 `36` 进制来说，一个有趣且有用的例子是，当我们需要将一个较长的数字标识符转换成较短的时候，例如做一个短的 URL。可以简单地使用基数为 `36` 的数字系统表示：
+
+  ```javascript
+  alert( 123456..toString(36) ); // 2n9c
+  ```
+
+> **使用两个点来调用一个方法**
+>
+> 请注意 `123456..toString(36)` 中的两个点不是打错了。如果我们想直接在一个数字上调用一个方法，比如上面例子中的 `toString`，那么我们需要在它后面放置两个点 `..`。
+>
+> 如果我们放置一个点：`123456.toString(36)`，那么就会出现一个 error，因为 JavaScript 语法隐含了第一个点之后的部分为小数部分。如果我们再放一个点，那么 JavaScript 就知道小数部分为空，现在使用该方法。
+>
+> 也可以写成 `(123456).toString(36)`。
+
+
+
+## 舍入
+
+舍入（rounding）是使用数字时最常用的操作之一。
+
+这里有几个对数字进行舍入的内建函数：
+
+- `Math.floor`
+
+  向下舍入：`3.1` 变成 `3`，`-1.1` 变成 `-2`。
+
+- `Math.ceil`
+
+  向上舍入：`3.1` 变成 `4`，`-1.1` 变成 `-1`。
+
+- `Math.round`
+
+  向最近的整数舍入：`3.1` 变成 `3`，`3.6` 变成 `4`，中间值 `3.5` 变成 `4`。
+
+- `Math.trunc`（IE 浏览器不支持这个方法）
+
+  移除小数点后的所有内容而没有舍入：`3.1` 变成 `3`，`-1.1` 变成 `-1`。
+
+这个是总结它们之间差异的表格：
+
+|        | `Math.floor` | `Math.ceil` | `Math.round` | `Math.trunc` |
+| :----- | :----------- | :---------- | :----------- | :----------- |
+| `3.1`  | `3`          | `4`         | `3`          | `3`          |
+| `3.6`  | `3`          | `4`         | `4`          | `3`          |
+| `-1.1` | `-2`         | `-1`        | `-1`         | `-1`         |
+| `-1.6` | `-2`         | `-1`        | `-2`         | `-1`         |
+
+这些函数涵盖了处理数字小数部分的所有可能方法。但是，如果我们想将数字舍入到小数点后 `n` 位，该怎么办？
+
+例如，我们有 `1.2345`，并且想把它舍入到小数点后两位，仅得到 `1.23`。
+
+有两种方式可以实现这个需求：
+
+1. 乘除法
+
+   例如，要将数字舍入到小数点后两位，我们可以将数字乘以 `100`，调用舍入函数，然后再将其除回。
+
+   ```javascript
+   let num = 1.23456;
+   
+   alert( Math.round(num * 100) / 100 ); // 1.23456 -> 123.456 -> 123 -> 1.23
+   ```
+
+2. 函数 [toFixed(n)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed) 将数字舍入到小数点后 `n` 位，并以字符串形式返回结果。
+
+   ```javascript
+   let num = 12.34;
+   alert( num.toFixed(1) ); // "12.3"
+   ```
+
+   这会向上或向下舍入到最接近的值，类似于 `Math.round`：
+
+   ```javascript
+   let num = 12.36;
+   alert( num.toFixed(1) ); // "12.4"
+   ```
+
+   请注意 `toFixed` 的结果是一个字符串。如果小数部分比所需要的短，则在结尾添加零：
+
+   ```javascript
+   let num = 12.34;
+   alert( num.toFixed(5) ); // "12.34000"，在结尾添加了 0，以达到小数点后五位
+   ```
+
+   我们可以使用一元加号或 `Number()` 调用，将其转换为数字，例如 `+ num.toFixed(5)`。
+
+
+
+## 测试isFinite和isNaN
+
+- `Infinity`（和 `-Infinity`）是一个特殊的数值，比任何数值都大（小）。
+- `NaN` 代表一个 error。
+
+它们属于 `number` 类型，但不是“普通”数字，因此，这里有用于检查它们的特殊函数：
+
+- `isNaN(value)` 将其参数转换为数字，然后测试它是否为 `NaN`：
+
+  ```javascript
+  alert( isNaN(NaN) ); // true
+  alert( isNaN("str") ); // true
+  ```
+
+  但是我们需要这个函数吗？我们不能只使用 `=== NaN` 比较吗？很不幸，这不行。值 “NaN” 是独一无二的，它不等于任何东西，包括它自身：
+
+  ```javascript
+  alert( NaN === NaN ); // false
+  ```
+
+- `isFinite(value)` 将其参数转换为数字，如果是常规数字而不是 `NaN/Infinity/-Infinity`，则返回 `true`：
+
+  ```javascript
+  alert( isFinite("15") ); // true
+  alert( isFinite("str") ); // false，因为是一个特殊的值：NaN
+  alert( isFinite(Infinity) ); // false，因为是一个特殊的值：Infinity
+  ```
+
+有时 `isFinite` 被用于验证字符串值是否为常规数字：
+
+```javascript
+let num = +prompt("Enter a number", '');
+
+// 结果会是 true，除非你输入的是 Infinity、-Infinity 或不是数字
+alert( isFinite(num) );
+```
+
+请注意，在所有数字函数中，包括 `isFinite`，空字符串或仅有空格的字符串均被视为 `0`。
+
+> **与 `Object.is` 进行比较**
+>
+> 有一个特殊的内建方法 `Object.is`，它类似于 `===` 一样对值进行比较，但它对于两种边缘情况更可靠：
+>
+> 1. 它适用于 `NaN`：`Object.is(NaN, NaN) === true`，这是件好事。
+> 2. 值 `0` 和 `-0` 是不同的：`Object.is(0, -0) === false`，从技术上讲这是对的，因为在内部，数字的符号位可能会不同，即使其他所有位均为零。
+>
+> 在所有其他情况下，`Object.is(a, b)` 与 `a === b` 相同。
+>
+> 这种比较方式经常被用在 JavaScript 规范中。当内部算法需要比较两个值是否完全相同时，它使用 `Object.is`（内部称为 [SameValue](https://tc39.github.io/ecma262/#sec-samevalue)）。
+
+
+
+## parseInt 和 parseFloat
+
+使用加号 `+` 或 `Number()` 的数字转换是严格的。如果一个值不完全是一个数字，就会失败：
+
+```javascript
+alert( +"100px" ); // NaN
+```
+
+唯一的例外是字符串开头或结尾的空格，因为它们会被忽略。
+
+但在现实生活中，我们经常会有带有单位的值，例如 CSS 中的 `"100px"` 或 `"12pt"`。并且，在很多国家，货币符号是紧随金额之后的，所以我们有 `"19€"`，并希望从中提取出一个数值。
+
+这就是 `parseInt` 和 `parseFloat` 的作用。
+
+它们可以从字符串中“读取”数字，直到无法读取为止。如果发生 error，则返回收集到的数字。函数 `parseInt` 返回一个整数，而 `parseFloat` 返回一个浮点数：
+
+```javascript
+alert( parseInt('100px') ); // 100
+alert( parseFloat('12.5em') ); // 12.5
+
+alert( parseInt('12.3') ); // 12，只有整数部分被返回了
+alert( parseFloat('12.3.4') ); // 12.3，在第二个点出停止了读取
+```
+
+某些情况下，`parseInt/parseFloat` 会返回 `NaN`。当没有数字可读时会发生这种情况：
+
+```javascript
+alert( parseInt('a123') ); // NaN，第一个符号停止了读取
+```
+
+> **parseInt(str, radix) 的第二个参数**
+>
+> `parseInt()` 函数具有可选的第二个参数。它指定了数字系统的基数，因此 `parseInt` 还可以解析十六进制数字、二进制数字等的字符串：
+>
+> ```javascript
+> alert( parseInt('0xff', 16) ); // 255
+> alert( parseInt('ff', 16) ); // 255，没有 0x 仍然有效
+> 
+> alert( parseInt('2n9c', 36) ); // 123456
+> ```
+
+
+
+## 其他数学函数
+
+JavaScript 有一个内建的 [Math](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math) 对象，它包含了一个小型的数学函数和常量库。
+
+几个例子：
+
+- `Math.random()`
+
+  返回一个从 0 到 1 的随机数（不包括 1）。
+
+  ```javascript
+  alert( Math.random() ); // 0.1234567894322
+  alert( Math.random() ); // 0.5435252343232
+  alert( Math.random() ); // ... (任何随机数)
+  ```
+
+- `Math.max(a, b, c...)` 和 `Math.min(a, b, c...)`
+
+  从任意数量的参数中返回最大值和最小值。
+
+  ```javascript
+  alert( Math.max(3, 5, -10, 0, 1) ); // 5
+  alert( Math.min(1, 2) ); // 1
+  ```
+
+- **`Math.pow(n, power)`**
+
+  ```js
+  alert( Math.pow(2, 10) ); // 2 的 10 次幂 = 1024
+  ```
+
+  `Math` 对象中还有更多函数和常量，包括三角函数，你可以在 [Math 对象文档](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math) 中找到这些内容。
+
+
+
+## 总结
+
+要写有很多零的数字：
+
+- 将 `"e"` 和 0 的数量附加到数字后。就像：`123e6` 与 `123` 后面接 6 个 0 相同。
+- `"e"` 后面的负数将使数字除以 1 后面接着给定数量的零的数字。例如 `123e-6` 表示 `0.000123`（`123` 的百万分之一）。
+
+对于不同的数字系统：
+
+- 可以直接在十六进制（`0x`），八进制（`0o`）和二进制（`0b`）系统中写入数字。
+- `parseInt(str, base)` 将字符串 `str` 解析为在给定的 `base` 数字系统中的整数，`2 ≤ base ≤ 36`。
+- `num.toString(base)` 将数字转换为在给定的 `base` 数字系统中的字符串。
+
+对于常规数字检测：
+
+- `isNaN(value)` 将其参数转换为数字，然后检测它是否为 `NaN`
+- `isFinite(value)` 将其参数转换为数字，如果它是常规数字，则返回 `true`，而不是 `NaN/Infinity/-Infinity`
+
+要将 `12pt` 和 `100px` 之类的值转换为数字：
+
+- 使用 `parseInt/parseFloat` 进行“软”转换，它从字符串中读取数字，然后返回在发生 error 前可以读取到的值。
+
+小数：
+
+- 使用 `Math.floor`，`Math.ceil`，`Math.trunc`，`Math.round` 或 `num.toFixed(precision)` 进行舍入。
+- 请确保记住使用小数时会损失精度。
+
+更多数学函数：
+
+- 需要时请查看 [Math](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math) 对象。这个库很小，但是可以满足基本的需求。
+
+
+
+# 字符串
+
