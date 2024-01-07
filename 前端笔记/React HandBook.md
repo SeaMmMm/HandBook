@@ -20,3 +20,10 @@
 
 
 
+# 注意适当的 props
+
+<img src="./React HandBook.assets/image-20240107下午41620360.png" alt="image-20240107下午41620360" style="zoom:20%;" />
+
+
+
+ 
