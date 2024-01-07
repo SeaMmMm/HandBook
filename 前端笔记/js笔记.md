@@ -1801,3 +1801,1166 @@ JavaScript 有一个内建的 [Math](https://developer.mozilla.org/en/docs/Web/J
 
 # 字符串
 
+## 特殊字符
+
+可以通过使用“换行符（newline character）”，以支持使用单引号和双引号来创建跨行字符串。换行符写作 `\n`，用来表示换行：
+
+```javascript
+let guestList = "Guests:\n * John\n * Pete\n * Mary";
+
+alert(guestList); // 一个多行的客人列表
+```
+
+例如，这两行描述的是一样的，只是书写方式不同：
+
+```javascript
+let str1 = "Hello\nWorld"; // 使用“换行符”创建的两行字符串
+
+// 使用反引号和普通的换行创建的两行字符串
+let str2 = `Hello
+World`;
+
+alert(str1 == str2); // true
+```
+
+还有其他不常见的“特殊”字符。
+
+这是完整列表：
+
+| 字符                                    | 描述                                                         |
+| :-------------------------------------- | :----------------------------------------------------------- |
+| `\n`                                    | 换行                                                         |
+| `\r`                                    | 在 Windows 文本文件中，两个字符 `\r\n` 的组合代表一个换行。而在非 Windows 操作系统上，它就是 `\n`。这是历史原因造成的，大多数的 Windows 软件也理解 `\n`。 |
+| `\'`, `\"`                              | 引号                                                         |
+| `\\`                                    | 反斜线                                                       |
+| `\t`                                    | 制表符                                                       |
+| `\b`, `\f`, `\v`                        | 退格，换页，垂直标签 —— 为了兼容性，现在已经不使用了。       |
+| `\xXX`                                  | 具有给定十六进制 Unicode `XX` 的 Unicode 字符，例如：`'\x7A'` 和 `'z'` 相同。 |
+| `\uXXXX`                                | 以 UTF-16 编码的十六进制代码 `XXXX` 的 Unicode 字符，例如 `\u00A9` —— 是版权符号 `©` 的 Unicode。它必须正好是 4 个十六进制数字。 |
+| `\u{X…XXXXXX}`（1 到 6 个十六进制字符） | 具有给定 UTF-32 编码的 Unicode 符号。一些罕见的字符用两个 Unicode 符号编码，占用 4 个字节。这样我们就可以插入长代码了。 |
+
+```javascript
+alert( "\u00A9" ); // ©
+alert( "\u{20331}" ); // 佫，罕见的中国象形文字（长 Unicode）
+alert( "\u{1F60D}" ); // 😍，笑脸符号（另一个长 Unicode）
+```
+
+所有的特殊字符都以反斜杠字符 `\` 开始。它也被称为“转义字符”。
+
+如果我们想要在字符串中插入一个引号，我们也会使用它。
+
+例如：
+
+```javascript
+alert( 'I\'m the Walrus!' ); // I'm the Walrus!
+```
+
+正如你所看到的，我们必须在内部引号前加上反斜杠 `\'`，否则它将表示字符串结束。
+
+当然，只有与外部闭合引号相同的引号才需要转义。因此，作为一个更优雅的解决方案，我们可以改用双引号或者反引号：
+
+```javascript
+alert( `I'm the Walrus!` ); // I'm the Walrus!
+```
+
+注意反斜杠 `\` 在 JavaScript 中用于正确读取字符串，然后消失。内存中的字符串没有 `\`。你从上述示例中的 `alert` 可以清楚地看到这一点。
+
+但是如果我们需要在字符串中显示一个实际的反斜杠 `\` 应该怎么做？
+
+我们可以这样做，只需要将其书写两次 `\\`：
+
+```javascript
+alert( `The backslash: \\` ); // The backslash: \
+```
+
+
+
+## 访问字符
+
+要获取在 `pos` 位置的一个字符，可以使用方括号 `[pos]` 或者调用 [str.charAt(pos)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/String/charAt) 方法。第一个字符从零位置开始：
+
+```javascript
+let str = `Hello`;
+
+// 第一个字符
+alert( str[0] ); // H
+alert( str.charAt(0) ); // H
+
+// 最后一个字符
+alert( str[str.length - 1] ); // o
+```
+
+方括号是获取字符的一种现代化方法，而 `charAt` 是历史原因才存在的。
+
+它们之间的唯一区别是，如果没有找到字符，`[]` 返回 `undefined`，而 `charAt` 返回一个空字符串：
+
+```javascript
+let str = `Hello`;
+
+alert( str[1000] ); // undefined
+alert( str.charAt(1000) ); // ''（空字符串）
+```
+
+我们也可以使用 `for..of` 遍历字符：
+
+```javascript
+for (let char of "Hello") {
+  alert(char); // H,e,l,l,o（char 变为 "H"，然后是 "e"，然后是 "l" 等）
+}
+```
+
+> `for in`与`for of`的不同(有点忘了):
+>
+> <img src="./js笔记.assets/image-20240105下午72007721.png" alt="image-20240105下午72007721" style="zoom:20%;" />
+
+
+
+## 按位（bitwise）NOT 技巧
+
+这里使用的一个老技巧是 [bitwise NOT](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT) `~` 运算符。它将数字转换为 32-bit 整数（如果存在小数部分，则删除小数部分），然后对其二进制表示形式中的所有位均取反。
+
+实际上，这意味着一件很简单的事儿：对于 32-bit 整数，`~n` 等于 `-(n+1)`。
+
+例如：
+
+```javascript
+alert( ~2 ); // -3，和 -(2+1) 相同
+alert( ~1 ); // -2，和 -(1+1) 相同
+alert( ~0 ); // -1，和 -(0+1) 相同
+alert( ~-1 ); // 0，和 -(-1+1) 相同
+```
+
+正如我们看到这样，只有当 `n == -1` 时，`~n` 才为零（适用于任何 32-bit 带符号的整数 `n`）。
+
+因此，仅当 `indexOf` 的结果不是 `-1` 时，检查 `if ( ~str.indexOf("...") )` 才为真。换句话说，当有匹配时。
+
+人们用它来简写 `indexOf` 检查：
+
+```javascript
+let str = "Widget";
+
+if (~str.indexOf("Widget")) {
+  alert( 'Found it!' ); // 正常运行
+}
+```
+
+通常不建议以非显而易见的方式使用语言特性，但这种特殊技巧在旧代码中仍被广泛使用，所以我们应该理解它。
+
+只要记住：`if (~str.indexOf(...))` 读作 “if found”。
+
+确切地说，由于 `~` 运算符将大数字截断为 32 位，因此存在给出 `0` 的其他数字，最小的数字是 `~4294967295=0`。这使得这种检查只有在字符串没有那么长的情况下才是正确的。
+
+现在我们只会在旧的代码中看到这个技巧，因为现代 JavaScript 提供了 `.includes` 方法
+
+
+
+## 一些字符串的方法
+
+| 方法                    | 选择方式……                                | 负值参数            |
+| :---------------------- | :---------------------------------------- | :------------------ |
+| `slice(start, end)`     | 从 `start` 到 `end`（不含 `end`）         | 允许                |
+| `substring(start, end)` | 从 `start` 到 `end`（不含 `end`）         | 负值被视为 `0`      |
+| `substr(start, length)` | 从 `start` 开始获取长为 `length` 的字符串 | 允许 `start` 为负数 |
+
+> **使用哪一个？**
+>
+> 它们都可用于获取子字符串。正式一点来讲，`substr` 有一个小缺点：它不是在 JavaScript 核心规范中描述的，而是在附录 B 中。附录 B 的内容主要是描述因历史原因而遗留下来的仅浏览器特性。因此，理论上非浏览器环境可能无法支持 `substr`，但实际上它在别的地方也都能用。
+>
+> 相较于其他两个变体，`slice` 稍微灵活一些，它允许以负值作为参数并且写法更简短。因此仅仅记住这三种方法中的 `slice` 就足够了。
+
+
+
+## 正确地比较字符串
+
+执行字符串比较的“正确”算法比看起来更复杂，因为不同语言的字母都不相同。
+
+因此浏览器需要知道要比较的语言。
+
+幸运的是，所有现代浏览器（IE10- 需要额外的库 [Intl.JS](https://github.com/andyearnshaw/Intl.js/)) 都支持国际化标准 [ECMA-402](http://www.ecma-international.org/ecma-402/1.0/ECMA-402.pdf)。
+
+它提供了一种特殊的方法来比较不同语言的字符串，遵循它们的规则。
+
+调用 [str.localeCompare(str2)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare) 会根据语言规则返回一个整数，这个整数能指示字符串 `str` 在排序顺序中排在字符串 `str2` 前面、后面、还是相同：
+
+- 如果 `str` 排在 `str2` 前面，则返回负数。
+- 如果 `str` 排在 `str2` 后面，则返回正数。
+- 如果它们在相同位置，则返回 `0`。
+
+例如：
+
+```javascript
+alert( 'Österreich'.localeCompare('Zealand') ); // -1
+```
+
+这个方法实际上在 [文档](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare) 中指定了两个额外的参数，这两个参数允许它指定语言（默认语言从环境中获取，字符顺序视语言不同而不同）并设置诸如区分大小写，或应该将 `"a"` 和 `"á"` 作相同处理等附加的规则。
+
+
+
+## 总结
+
+- 有 3 种类型的引号。反引号允许字符串跨越多行并可以使用 `${…}` 在字符串中嵌入表达式。
+- JavaScript 中的字符串使用的是 UTF-16 编码。
+- 我们可以使用像 `\n` 这样的特殊字符或通过使用 `\u...` 来操作它们的 Unicode 进行字符插入。
+- 获取字符时，使用 `[]`。
+- 获取子字符串，使用 `slice` 或 `substring`。
+- 字符串的大/小写转换，使用：`toLowerCase/toUpperCase`。
+- 查找子字符串时，使用 `indexOf` 或 `includes/startsWith/endsWith` 进行简单检查。
+- 根据语言比较字符串时使用 `localeCompare`，否则将按字符代码进行比较。
+
+还有其他几种有用的字符串方法：
+
+- `str.trim()` —— 删除字符串前后的空格 (“trims”)。
+- `str.repeat(n)` —— 重复字符串 `n` 次。
+- ……更多内容细节请参见 [手册](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/String)。
+
+字符串还具有使用正则表达式进行搜索/替换的方法。但这个话题很大
+
+
+
+# 数组
+
+## 数组可以存储任何类型的元素
+
+例如:
+
+```javascript
+// 混合值
+let arr = [ 'Apple', { name: 'John' }, true, function() { alert('hello'); } ];
+
+// 获取索引为 1 的对象然后显示它的 name
+alert( arr[1].name ); // John
+
+// 获取索引为 3 的函数并执行
+arr[3](); // hello
+```
+
+
+
+## 使用 “at” 获取最后一个元素
+
+> **最近新增的特性**
+>
+> 这是一个最近添加到 JavaScript 的特性。 旧式浏览器可能需要 polyfills.
+
+假设我们想要数组的最后一个元素。
+
+一些编程语言允许我们使用负数索引来实现这一点，例如 `fruits[-1]`。
+
+但在 JavaScript 中这行不通。结果将是 `undefined`，因为方括号中的索引是被按照其字面意思处理的。
+
+我们可以显式地计算最后一个元素的索引，然后访问它：`fruits[fruits.length - 1]`。
+
+```javascript
+let fruits = ["Apple", "Orange", "Plum"];
+
+alert( fruits[fruits.length-1] ); // Plum
+```
+
+有点麻烦，不是吗？我们需要写两次变量名。
+
+幸运的是，这里有一个更简短的语法 `fruits.at(-1)`：
+
+```javascript
+let fruits = ["Apple", "Orange", "Plum"];
+
+// 与 fruits[fruits.length-1] 相同
+alert( fruits.at(-1) ); // Plum
+```
+
+换句话说，`arr.at(i)`：
+
+- 如果 `i >= 0`，则与 `arr[i]` 完全相同。
+- 对于 `i` 为负数的情况，它则从数组的尾部向前数。
+
+
+
+## 性能
+
+`push/pop` 方法运行的比较快，而 `shift/unshift` 比较慢。
+
+<img src="./js笔记.assets/image-20240105下午83303026.png" alt="image-20240105下午83303026" style="zoom:50%;" />
+
+为什么作用于数组的末端会比首端快呢？让我们看看在执行期间都发生了什么：
+
+```javascript
+fruits.shift(); // 从首端取出一个元素
+```
+
+只获取并移除索引 `0` 对应的元素是不够的。其它元素也需要被重新编号。
+
+`shift` 操作必须做三件事:
+
+1. 移除索引为 `0` 的元素。
+2. 把所有的元素向左移动，把索引 `1` 改成 `0`，`2` 改成 `1` 以此类推，对其重新编号。
+3. 更新 `length` 属性。
+
+<img src="./js笔记.assets/image-20240105下午83324269.png" alt="image-20240105下午83324269" style="zoom:50%;" />
+
+**数组里的元素越多，移动它们就要花越多的时间，也就意味着越多的内存操作。**
+
+`unshift` 也是一样：为了在数组的首端添加元素，我们首先需要将现有的元素向右移动，增加它们的索引值。
+
+那 `push/pop` 是什么样的呢？它们不需要移动任何东西。如果从末端移除一个元素，`pop` 方法只需要清理索引值并缩短 `length` 就可以了。
+
+`pop` 操作的行为：
+
+```javascript
+fruits.pop(); // 从末端取走一个元素
+```
+
+<img src="./js笔记.assets/image-20240105下午83403531.png" alt="image-20240105下午83403531" style="zoom:50%;" />
+
+**`pop` 方法不需要移动任何东西，因为其它元素都保留了各自的索引。这就是为什么 `pop` 会特别快。**
+
+`push` 方法也是一样的。
+
+
+
+## 循环
+
+遍历数组最古老的方式就是 `for` 循环：
+
+```javascript
+let arr = ["Apple", "Orange", "Pear"];
+
+for (let i = 0; i < arr.length; i++) {
+  alert( arr[i] );
+}
+```
+
+但对于数组来说还有另一种循环方式，`for..of`：
+
+```javascript
+let fruits = ["Apple", "Orange", "Plum"];
+
+// 遍历数组元素
+for (let fruit of fruits) {
+  alert( fruit );
+}
+```
+
+`for..of` 不能获取当前元素的索引，只是获取元素值，但大多数情况是够用的。而且这样写更短。
+
+技术上来讲，因为数组也是对象，所以使用 `for..in` 也是可以的：
+
+```javascript
+let arr = ["Apple", "Orange", "Pear"];
+
+for (let key in arr) {
+  alert( arr[key] ); // Apple, Orange, Pear
+}
+```
+
+但这其实是一个很不好的想法。会有一些潜在问题存在：
+
+1. `for..in` 循环会遍历 **所有属性**，不仅仅是这些数字属性。
+
+   在浏览器和其它环境中有一种称为“类数组”的对象，它们 **看似是数组**。也就是说，它们有 `length` 和索引属性，但是也可能有其它的非数字的属性和方法，这通常是我们不需要的。`for..in` 循环会把它们都列出来。所以如果我们需要处理类数组对象，这些“额外”的属性就会存在问题。
+
+2. `for..in` 循环适用于普通对象，并且做了对应的优化。但是不适用于数组，因此速度要慢 10-100 倍。当然即使是这样也依然非常快。只有在遇到瓶颈时可能会有问题。但是我们仍然应该了解这其中的不同。
+
+通常来说，我们不应该用 `for..in` 来处理数组。
+
+
+
+## 总结
+
+数组是一种特殊的对象，适用于存储和管理有序的数据项。
+
+声明：
+
+```javascript
+// 方括号 (常见用法)
+let arr = [item1, item2...];
+
+// new Array (极其少见)
+let arr = new Array(item1, item2...);
+```
+
+调用 `new Array(number)` 会创建一个给定长度的数组，但不含有任何项。
+
+- `length` 属性是数组的长度，准确地说，它是数组最后一个数字索引值加一。它由数组方法自动调整。
+- 如果我们手动缩短 `length`，那么数组就会被截断。
+
+获取元素：
+
+- 你可以通过元素的索引获取元素，例如 `arr[0]`
+- 我们也可以使用允许负索引的 `at(i)` 方法。对于负值的 `i`，它会从数组的末尾往回数。如果 `i >= 0`，它的工作方式与 `arr[i]` 相同。
+
+我们可以通过下列操作以双端队列的方式使用数组：
+
+- `push(...items)` 在末端添加 `items` 项。
+- `pop()` 从末端移除并返回该元素。
+- `shift()` 从首端移除并返回该元素。
+- `unshift(...items)` 从首端添加 `items` 项。
+
+遍历数组的元素：
+
+- `for (let i=0; i<arr.length; i++)` — 运行得最快，可兼容旧版本浏览器。
+- `for (let item of arr)` — 现代语法，只能访问 items。
+- `for (let i in arr)` — 永远不要用这个。
+
+比较数组时，不要使用 `==` 运算符（当然也不要使用 `>` 和 `<` 等运算符），因为它们不会对数组进行特殊处理。它们通常会像处理任意对象那样处理数组，这通常不是我们想要的。
+
+但是，我们可以使用 `for..of` 循环来逐项比较数组。
+
+
+
+# 数组方法
+
+## splice
+
+如何从数组中删除元素？
+
+数组是对象，所以我们可以尝试使用 `delete`：
+
+```javascript
+let arr = ["I", "go", "home"];
+
+delete arr[1]; // remove "go"
+
+alert( arr[1] ); // undefined
+
+// now arr = ["I",  , "home"];
+alert( arr.length ); // 3
+```
+
+元素被删除了，但数组仍然有 3 个元素，我们可以看到 `arr.length == 3`。
+
+这很正常，因为 `delete obj.key` 是通过 `key` 来移除对应的值。对于对象来说是可以的。但是对于数组来说，我们通常希望剩下的元素能够移动并占据被释放的位置。我们希望得到一个更短的数组。
+
+所以应该使用特殊的方法。
+
+[arr.splice](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) 方法可以说是处理数组的瑞士军刀。它可以做所有事情：添加，删除和插入元素。
+
+语法是：
+
+```javascript
+arr.splice(start[, deleteCount, elem1, ..., elemN])
+```
+
+它从索引 `start` 开始修改 `arr`：删除 `deleteCount` 个元素并在当前位置插入 `elem1, ..., elemN`。最后返回被删除的元素所组成的数组。
+
+通过例子我们可以很容易地掌握这个方法。
+
+让我们从删除开始：
+
+```javascript
+let arr = ["I", "study", "JavaScript"];
+
+arr.splice(1, 1); // 从索引 1 开始删除 1 个元素
+
+alert( arr ); // ["I", "JavaScript"]
+```
+
+简单，对吧？从索引 `1` 开始删除 `1` 个元素。（译注：当只填写了 `splice` 的 `start` 参数时，将删除从索引 `start` 开始的所有数组项）
+
+在下一个例子中，我们删除了 3 个元素，并用另外两个元素替换它们：
+
+```javascript
+let arr = ["I", "study", "JavaScript", "right", "now"];
+
+// 删除数组的前三项，并使用其他内容代替它们
+arr.splice(0, 3, "Let's", "dance");
+
+alert( arr ) // 现在 ["Let's", "dance", "right", "now"]
+```
+
+在这里我们可以看到 `splice` 返回了被删除的元素所组成的数组：
+
+```javascript
+let arr = ["I", "study", "JavaScript", "right", "now"];
+
+// 删除前两个元素
+let removed = arr.splice(0, 2);
+
+alert( removed ); // "I", "study" <-- 被从数组中删除了的元素
+```
+
+我们可以将 `deleteCount` 设置为 `0`，`splice` 方法就能够插入元素而不用删除任何元素：
+
+```javascript
+let arr = ["I", "study", "JavaScript"];
+
+// 从索引 2 开始
+// 删除 0 个元素
+// 然后插入 "complex" 和 "language"
+arr.splice(2, 0, "complex", "language");
+
+alert( arr ); // "I", "study", "complex", "language", "JavaScript"
+```
+
+> **允许负向索引**
+>
+> 在这里和其他数组方法中，负向索引都是被允许的。它们从数组末尾计算位置，如下所示：
+>
+> ```javascript
+> let arr = [1, 2, 5];
+> 
+> // 从索引 -1（尾端前一位）
+> // 删除 0 个元素，
+> // 然后插入 3 和 4
+> arr.splice(-1, 0, 3, 4);
+> 
+> alert( arr ); // 1,2,3,4,5
+> ```
+
+
+
+## slice
+
+[arr.slice](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) 方法比 `arr.splice` 简单得多。
+
+语法是：
+
+```javascript
+arr.slice([start], [end])
+```
+
+它会返回一个新数组，将所有从索引 `start` 到 `end`（不包括 `end`）的数组项复制到一个新的数组。`start` 和 `end` 都可以是负数，在这种情况下，从末尾计算索引。
+
+它和字符串的 `str.slice` 方法有点像，就是把子字符串替换成子数组。
+
+例如：
+
+```javascript
+let arr = ["t", "e", "s", "t"];
+
+alert( arr.slice(1, 3) ); // e,s（复制从位置 1 到位置 3 的元素）
+
+alert( arr.slice(-2) ); // s,t（复制从位置 -2 到尾端的元素）
+```
+
+我们也可以不带参数地调用它：`arr.slice()` 会创建一个 `arr` 的副本。其通常用于获取副本，以进行不影响原始数组的进一步转换。
+
+
+
+## contact
+
+[arr.concat](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/concat) 创建一个新数组，其中包含来自于其他数组和其他项的值。
+
+语法：
+
+```javascript
+arr.concat(arg1, arg2...)
+```
+
+它接受任意数量的参数 —— 数组或值都可以。
+
+结果是一个包含来自于 `arr`，然后是 `arg1`，`arg2` 的元素的新数组。
+
+如果参数 `argN` 是一个数组，那么其中的所有元素都会被复制。否则，将复制参数本身。
+
+例如：
+
+```javascript
+let arr = [1, 2];
+
+// 从 arr 和 [3,4] 创建一个新数组
+alert( arr.concat([3, 4]) ); // 1,2,3,4
+
+// 从 arr、[3,4] 和 [5,6] 创建一个新数组
+alert( arr.concat([3, 4], [5, 6]) ); // 1,2,3,4,5,6
+
+// 从 arr、[3,4]、5 和 6 创建一个新数组
+alert( arr.concat([3, 4], 5, 6) ); // 1,2,3,4,5,6
+```
+
+通常，它只复制数组中的元素。其他对象，即使它们看起来像数组一样，但仍然会被作为一个整体添加：
+
+```javascript
+let arr = [1, 2];
+
+let arrayLike = {
+  0: "something",
+  length: 1
+};
+
+alert( arr.concat(arrayLike) ); // 1,2,[object Object]
+```
+
+……但是，如果类数组对象具有 `Symbol.isConcatSpreadable` 属性，那么它就会被 `concat` 当作一个数组来处理：此对象中的元素将被添加：
+
+```javascript
+let arr = [1, 2];
+
+let arrayLike = {
+  0: "something",
+  1: "else",
+  [Symbol.isConcatSpreadable]: true,
+  length: 2
+};
+
+alert( arr.concat(arrayLike) ); // 1,2,something,else
+```
+
+
+
+## 遍历 forEach
+
+[arr.forEach](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) 方法允许为数组的每个元素都运行一个函数。
+
+语法：
+
+```javascript
+arr.forEach(function(item, index, array) {
+  // ... do something with item
+});
+```
+
+例如，下面这个程序显示了数组的每个元素：
+
+```javascript
+// 对每个元素调用 alert
+["Bilbo", "Gandalf", "Nazgul"].forEach(alert);
+```
+
+而这段代码更详细地介绍了它们在目标数组中的位置：
+
+```javascript
+["Bilbo", "Gandalf", "Nazgul"].forEach((item, index, array) => {
+  alert(`${item} is at index ${index} in ${array}`);
+});
+```
+
+该函数的结果（如果它有返回）会被抛弃和忽略。
+
+
+
+## find 和 findIndex/findLastIndex
+
+想象一下，我们有一个对象数组。我们如何找到具有特定条件的对象？
+
+这时可以用 [arr.find](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/find) 方法。
+
+语法如下：
+
+```javascript
+let result = arr.find(function(item, index, array) {
+  // 如果返回 true，则返回 item 并停止迭代
+  // 对于假值（falsy）的情况，则返回 undefined
+});
+```
+
+依次对数组中的每个元素调用该函数：
+
+- `item` 是元素。
+- `index` 是它的索引。
+- `array` 是数组本身。
+
+如果它返回 `true`，则搜索停止，并返回 `item`。如果没有搜索到，则返回 `undefined`。
+
+例如，我们有一个存储用户的数组，每个用户都有 `id` 和 `name` 字段。让我们找到 `id == 1` 的那个用户：
+
+```javascript
+let users = [
+  {id: 1, name: "John"},
+  {id: 2, name: "Pete"},
+  {id: 3, name: "Mary"}
+];
+
+let user = users.find(item => item.id == 1);
+
+alert(user.name); // John
+```
+
+在现实生活中，对象数组是很常见的，所以 `find` 方法非常有用。
+
+注意在这个例子中，我们传给了 `find` 一个单参数函数 `item => item.id == 1`。这很典型，并且 `find` 方法的其他参数很少使用。
+
+[arr.findIndex](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex) 方法（与 `arr.find`）具有相同的语法，但它返回找到的元素的索引，而不是元素本身。如果没找到，则返回 `-1`。
+
+[arr.findLastIndex](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex) 方法类似于 `findIndex`，但从右向左搜索，类似于 `lastIndexOf`。
+
+这是一个例子：
+
+```javascript
+let users = [
+  {id: 1, name: "John"},
+  {id: 2, name: "Pete"},
+  {id: 3, name: "Mary"},
+  {id: 4, name: "John"}
+];
+
+// 寻找第一个 John 的索引
+alert(users.findIndex(user => user.name == 'John')); // 0
+
+// 寻找最后一个 John 的索引
+alert(users.findLastIndex(user => user.name == 'John')); // 3
+```
+
+
+
+## filter
+
+`find` 方法搜索的是使函数返回 `true` 的第一个（单个）元素。
+
+如果需要匹配的有很多，我们可以使用 [arr.filter(fn)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)。
+
+语法与 `find` 大致相同，但是 `filter` 返回的是所有匹配元素组成的数组：
+
+```javascript
+let results = arr.filter(function(item, index, array) {
+  // 如果 true item 被 push 到 results，迭代继续
+  // 如果什么都没找到，则返回空数组
+});
+```
+
+例如：
+
+```javascript
+let users = [
+  {id: 1, name: "John"},
+  {id: 2, name: "Pete"},
+  {id: 3, name: "Mary"}
+];
+
+// 返回前两个用户的数组
+let someUsers = users.filter(item => item.id < 3);
+
+alert(someUsers.length); // 2
+```
+
+
+
+## map
+
+[arr.map](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/map) 方法是最有用和经常使用的方法之一。
+
+它对数组的每个元素都调用函数，并返回结果数组。
+
+语法：
+
+```javascript
+let result = arr.map(function(item, index, array) {
+  // 返回新值而不是当前元素
+})
+```
+
+例如，在这里我们将每个元素转换为它的字符串长度：
+
+```javascript
+let lengths = ["Bilbo", "Gandalf", "Nazgul"].map(item => item.length);
+alert(lengths); // 5,7,6
+```
+
+
+
+## sort(fn)
+
+[arr.sort](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) 方法对数组进行 **原位（in-place）** 排序，更改元素的顺序。(译注：原位是指在此数组内，而非生成一个新数组。)
+
+它还返回排序后的数组，但是返回值通常会被忽略，因为修改了 `arr` 本身。
+
+语法：
+
+```javascript
+let arr = [ 1, 2, 15 ];
+
+// 该方法重新排列 arr 的内容
+arr.sort();
+
+alert( arr );  // 1, 15, 2
+```
+
+你有没有注意到结果有什么奇怪的地方？
+
+顺序变成了 `1, 15, 2`。不对，但为什么呢？
+
+**这些元素默认情况下被按字符串进行排序。**
+
+从字面上看，所有元素都被转换为字符串，然后进行比较。对于字符串，按照词典顺序进行排序，实际上应该是 `"2" > "15"`。
+
+要使用我们自己的排序顺序，我们需要提供一个函数作为 `arr.sort()` 的参数。
+
+该函数应该比较两个任意值并返回：
+
+```javascript
+function compare(a, b) {
+  if (a > b) return 1; // 如果第一个值比第二个值大
+  if (a == b) return 0; // 如果两个值相等
+  if (a < b) return -1; // 如果第一个值比第二个值小
+}
+```
+
+例如，按数字进行排序：
+
+```javascript
+function compareNumeric(a, b) {
+  if (a > b) return 1;
+  if (a == b) return 0;
+  if (a < b) return -1;
+}
+
+let arr = [ 1, 2, 15 ];
+
+arr.sort(compareNumeric);
+
+alert(arr);  // 1, 2, 15
+```
+
+现在结果符合预期了。
+
+我们思考一下这儿发生了什么。`arr` 可以是由任何内容组成的数组，对吗？它可能包含数字、字符串、对象或其他任何内容。我们有一组 **一些元素**。要对其进行排序，我们需要一个 **排序函数** 来确认如何比较这些元素。默认是按字符串进行排序的。
+
+`arr.sort(fn)` 方法实现了通用的排序算法。我们不需要关心它的内部工作原理（大多数情况下都是经过 [快速排序](https://en.wikipedia.org/wiki/Quicksort) 或 [Timsort](https://en.wikipedia.org/wiki/Timsort) 算法优化的）。它将遍历数组，使用提供的函数比较其元素并对其重新排序，我们所需要的就是提供执行比较的函数 `fn`。
+
+顺便说一句，如果我们想知道要比较哪些元素 —— 那么什么都不会阻止 alert 它们：
+
+```javascript
+[1, -2, 15, 2, 0, 8].sort(function(a, b) {
+  alert( a + " <> " + b );
+  return a - b;
+});
+```
+
+该算法可以在此过程中，将一个元素与多个其他元素进行比较，但是它会尝试进行尽可能少的比较。
+
+> **比较函数可以返回任何数字**
+>
+> 实际上，比较函数只需要返回一个正数表示“大于”，一个负数表示“小于”。
+>
+> 通过这个原理我们可以编写更短的函数：
+>
+> ```javascript
+> let arr = [ 1, 2, 15 ];
+> 
+> arr.sort(function(a, b) { return a - b; });
+> 
+> alert(arr);  // 1, 2, 15
+> ```
+
+> **箭头函数最好**
+>
+> 你还记得 [箭头函数](https://zh.javascript.info/arrow-functions-basics) 吗？这里使用箭头函数会更加简洁：
+>
+> ```javascript
+> arr.sort( (a, b) => a - b );
+> ```
+>
+> 这与上面更长的版本完全相同。
+
+> **使用 `localeCompare` for strings**
+>
+> 你记得 [字符串比较](https://zh.javascript.info/string#correct-comparisons) 算法吗？默认情况下，它通过字母的代码比较字母。
+>
+> 对于许多字母，最好使用 `str.localeCompare` 方法正确地对字母进行排序，例如 `Ö`。
+>
+> 例如，让我们用德语对几个国家/地区进行排序：
+>
+> ```javascript
+> let countries = ['Österreich', 'Andorra', 'Vietnam'];
+> 
+> alert( countries.sort( (a, b) => a > b ? 1 : -1) ); // Andorra, Vietnam, Österreich（错的）
+> 
+> alert( countries.sort( (a, b) => a.localeCompare(b) ) ); // Andorra,Österreich,Vietnam（对的！）
+> ```
+
+
+
+## reserve
+
+[arr.reverse](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse) 方法用于颠倒 `arr` 中元素的顺序。
+
+例如：
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+arr.reverse();
+
+alert( arr ); // 5,4,3,2,1
+```
+
+它也会返回颠倒后的数组 `arr`。
+
+
+
+## split 和 join
+
+举一个现实生活场景的例子。我们正在编写一个消息应用程序，并且该人员输入以逗号分隔的接收者列表：`John, Pete, Mary`。但对我们来说，名字数组比单个字符串舒适得多。怎么做才能获得这样的数组呢？
+
+[str.split(delim)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/String/split) 方法可以做到。它通过给定的分隔符 `delim` 将字符串分割成一个数组。
+
+在下面的例子中，我们用“逗号后跟着一个空格”作为分隔符：
+
+```javascript
+let names = 'Bilbo, Gandalf, Nazgul';
+
+let arr = names.split(', ');
+
+for (let name of arr) {
+  alert( `A message to ${name}.` ); // A message to Bilbo（和其他名字）
+}
+```
+
+`split` 方法有一个可选的第二个数字参数 —— 对数组长度的限制。如果提供了，那么额外的元素会被忽略。但实际上它很少使用：
+
+```javascript
+let arr = 'Bilbo, Gandalf, Nazgul, Saruman'.split(', ', 2);
+
+alert(arr); // Bilbo, Gandalf
+```
+
+> **拆分为字母**
+>
+> 调用带有空参数 `s` 的 `split(s)`，会将字符串拆分为字母数组：
+>
+> ```javascript
+> let str = "test";
+> 
+> alert( str.split('') ); // t,e,s,t
+> ```
+
+[arr.join(glue)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/join) 与 `split` 相反。它会在它们之间创建一串由 `glue` 粘合的 `arr` 项。
+
+例如：
+
+```javascript
+let arr = ['Bilbo', 'Gandalf', 'Nazgul'];
+
+let str = arr.join(';'); // 使用分号 ; 将数组粘合成字符串
+
+alert( str ); // Bilbo;Gandalf;Nazgul
+```
+
+
+
+## reduce/reduceRight
+
+当我们需要遍历一个数组时 —— 我们可以使用 `forEach`，`for` 或 `for..of`。
+
+当我们需要遍历并返回每个元素的数据时 —— 我们可以使用 `map`。
+
+[arr.reduce](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce) 方法和 [arr.reduceRight](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight) 方法和上面的种类差不多，但稍微复杂一点。它们用于根据数组计算单个值。
+
+语法是：
+
+```javascript
+let value = arr.reduce(function(accumulator, item, index, array) {
+  // ...
+}, [initial]);
+```
+
+该函数一个接一个地应用于所有数组元素，并将其结果“搬运（carry on）”到下一个调用。
+
+参数：
+
+- `accumulator` —— 是上一个函数调用的结果，第一次等于 `initial`（如果提供了 `initial` 的话）。
+- `item` —— 当前的数组元素。
+- `index` —— 当前索引。
+- `arr` —— 数组本身。
+
+应用函数时，上一个函数调用的结果将作为第一个参数传递给下一个函数。
+
+因此，第一个参数本质上是累加器，用于存储所有先前执行的组合结果。最后，它成为 `reduce` 的结果。
+
+听起来复杂吗？
+
+掌握这个知识点的最简单的方法就是通过示例。
+
+在这里，我们通过一行代码得到一个数组的总和：
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+
+let result = arr.reduce((sum, current) => sum + current, 0);
+
+alert(result); // 15
+```
+
+传递给 `reduce` 的函数仅使用了 2 个参数，通常这就足够了。
+
+让我们看看细节，到底发生了什么。
+
+1. 在第一次运行时，`sum` 的值为初始值 `initial`（`reduce` 的最后一个参数），等于 0，`current` 是第一个数组元素，等于 `1`。所以函数运行的结果是 `1`。
+2. 在第二次运行时，`sum = 1`，我们将第二个数组元素（`2`）与其相加并返回。
+3. 在第三次运行中，`sum = 3`，我们继续把下一个元素与其相加，以此类推……
+
+计算流程：
+
+<img src="./js笔记.assets/image-20240107上午115615941.png" alt="image-20240107上午115615941" style="zoom:50%;" />
+
+或者以表格的形式表示，每一行代表的是对下一个数组元素的函数调用：
+
+|             | `sum` | `current` | `result` |
+| :---------- | :---- | :-------- | :------- |
+| 第 1 次调用 | `0`   | `1`       | `1`      |
+| 第 2 次调用 | `1`   | `2`       | `3`      |
+| 第 3 次调用 | `3`   | `3`       | `6`      |
+| 第 4 次调用 | `6`   | `4`       | `10`     |
+| 第 5 次调用 | `10`  | `5`       | `15`     |
+
+在这里，我们可以清楚地看到上一个调用的结果如何成为下一个调用的第一个参数。
+
+我们也可以省略初始值：
+
+```javascript
+let arr = [1, 2, 3, 4, 5];
+
+// 删除 reduce 的初始值（没有 0）
+let result = arr.reduce((sum, current) => sum + current);
+
+alert( result ); // 15
+```
+
+结果是一样的。这是因为如果没有初始值，那么 `reduce` 会将数组的第一个元素作为初始值，并从第二个元素开始迭代。
+
+计算表与上面相同，只是去掉第一行。
+
+但是这种使用需要非常小心。如果数组为空，那么在没有初始值的情况下调用 `reduce` 会导致错误。
+
+例如：
+
+```javascript
+let arr = [];
+
+// Error: Reduce of empty array with no initial value
+// 如果初始值存在，则 reduce 将为空 arr 返回它（即这个初始值）。
+arr.reduce((sum, current) => sum + current);
+```
+
+所以建议始终指定初始值。
+
+[arr.reduceRight](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight) 和 [arr.reduce](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce) 方法的功能一样，只是遍历为从右到左。
+
+
+
+## Array.isArray
+
+数组是基于对象的，不构成单独的语言类型。
+
+所以 `typeof` 不能帮助从数组中区分出普通对象：
+
+```javascript
+alert(typeof {}); // object
+alert(typeof []); // object（相同）
+```
+
+……但是数组经常被使用，因此有一种特殊的方法用于判断：[Array.isArray(value)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray)。如果 `value` 是一个数组，则返回 `true`；否则返回 `false`。
+
+```javascript
+alert(Array.isArray({})); // false
+
+alert(Array.isArray([])); // true
+```
+
+
+
+## 大多数方法都支持`thisArg`
+
+几乎所有调用函数的数组方法 —— 比如 `find`，`filter`，`map`，除了 `sort` 是一个特例，都接受一个可选的附加参数 `thisArg`。
+
+上面的部分中没有解释该参数，因为该参数很少使用。但是为了完整性，我们需要讲讲它。
+
+以下是这些方法的完整语法：
+
+```javascript
+arr.find(func, thisArg);
+arr.filter(func, thisArg);
+arr.map(func, thisArg);
+// ...
+// thisArg 是可选的最后一个参数
+```
+
+`thisArg` 参数的值在 `func` 中变为 `this`。
+
+例如，在这里我们使用 `army` 对象方法作为过滤器，`thisArg` 用于传递上下文（passes the context）：
+
+```javascript
+let army = {
+  minAge: 18,
+  maxAge: 27,
+  canJoin(user) {
+    return user.age >= this.minAge && user.age < this.maxAge;
+  }
+};
+
+let users = [
+  {age: 16},
+  {age: 20},
+  {age: 23},
+  {age: 30}
+];
+
+// 找到 army.canJoin 返回 true 的 user
+let soldiers = users.filter(army.canJoin, army);
+
+alert(soldiers.length); // 2
+alert(soldiers[0].age); // 20
+alert(soldiers[1].age); // 23
+```
+
+如果在上面的示例中我们使用了 `users.filter(army.canJoin)`，那么 `army.canJoin` 将被作为独立函数调用，并且这时 `this=undefined`，从而会导致即时错误。
+
+可以用 `users.filter(user => army.canJoin(user))` 替换对 `users.filter(army.canJoin, army)` 的调用。前者的使用频率更高，因为对于大多数人来说，它更容易理解。
+
+
+
+## 总结
+
+数组方法备忘单：
+
+- 添加/删除元素：
+  - `push(...items)` —— 向尾端添加元素，
+  - `pop()` —— 从尾端提取一个元素，
+  - `shift()` —— 从首端提取一个元素，
+  - `unshift(...items)` —— 向首端添加元素，
+  - `splice(pos, deleteCount, ...items)` —— 从 `pos` 开始删除 `deleteCount` 个元素，并插入 `items`。
+  - `slice(start, end)` —— 创建一个新数组，将从索引 `start` 到索引 `end`（但不包括 `end`）的元素复制进去。
+  - `concat(...items)` —— 返回一个新数组：复制当前数组的所有元素，并向其中添加 `items`。如果 `items` 中的任意一项是一个数组，那么就取其元素。
+- 搜索元素：
+  - `indexOf/lastIndexOf(item, pos)` —— 从索引 `pos` 开始搜索 `item`，搜索到则返回该项的索引，否则返回 `-1`。
+  - `includes(value)` —— 如果数组有 `value`，则返回 `true`，否则返回 `false`。
+  - `find/filter(func)` —— 通过 `func` 过滤元素，返回使 `func` 返回 `true` 的第一个值/所有值。
+  - `findIndex` 和 `find` 类似，但返回索引而不是值。
+- 遍历元素：
+  - `forEach(func)` —— 对每个元素都调用 `func`，不返回任何内容。
+- 转换数组：
+  - `map(func)` —— 根据对每个元素调用 `func` 的结果创建一个新数组。
+  - `sort(func)` —— 对数组进行原位（in-place）排序，然后返回它。
+  - `reverse()` —— 原位（in-place）反转数组，然后返回它。
+  - `split/join` —— 将字符串转换为数组并返回。
+  - `reduce/reduceRight(func, initial)` —— 通过对每个元素调用 `func` 计算数组上的单个值，并在调用之间传递中间结果。
+- 其他：
+  - `Array.isArray(value)` 检查 `value` 是否是一个数组，如果是则返回 `true`，否则返回 `false`。
+
+请注意，`sort`，`reverse` 和 `splice` 方法修改的是数组本身。
+
+这些是最常用的方法，它们覆盖 99％ 的用例。但是还有其他几个：
+
+- [arr.some(fn)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/some)/[arr.every(fn)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/every) 检查数组。
+
+  与 `map` 类似，对数组的每个元素调用函数 `fn`。如果任何/所有结果为 `true`，则返回 `true`，否则返回 `false`。
+
+  这两个方法的行为类似于 `||` 和 `&&` 运算符：如果 `fn` 返回一个真值，`arr.some()` 立即返回 `true` 并停止迭代其余数组项；如果 `fn` 返回一个假值，`arr.every()` 立即返回 `false` 并停止对其余数组项的迭代。
+
+  我们可以使用 `every` 来比较数组：
+
+  ```javascript
+  function arraysEqual(arr1, arr2) {
+    return arr1.length === arr2.length && arr1.every((value, index) => value === arr2[index]);
+  }
+  
+  alert( arraysEqual([1, 2], [1, 2])); // true
+  ```
+
+- [arr.fill(value, start, end)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/fill) —— 从索引 `start` 到 `end`，用重复的 `value` 填充数组。
+
+- [arr.copyWithin(target, start, end)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin) —— 将从位置 `start` 到 `end` 的所有元素复制到 **自身** 的 `target` 位置（覆盖现有元素）。
+
+- [arr.flat(depth)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/flat)/[arr.flatMap(fn)](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap) 从多维数组创建一个新的扁平数组。
+
+- [Array.of(element0[, element1[, …[, elementN\]]])](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array/of) 基于可变数量的参数创建一个新的 `Array` 实例，而不需要考虑参数的数量或类型。
+
+有关完整列表，请参阅 [手册](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Array)。
+
+乍看起来，似乎有很多方法，很难记住。但实际上这比看起来要容易得多。
+
+浏览这个备忘单，以了解这些方法。然后解决本章中的习题来进行练习，以便让你有数组方法的使用经验。
+
+然后，每当你需要对数组进行某些操作，而又不知道怎么做的时候，请回到这儿，查看这个备忘单，然后找到正确的方法。示例将帮助你正确编写它。用不了多久，你就自然而然地记住这些方法了，根本不需要你死记硬背。
+
+
+
+# Iterable object（可迭代对象）
+
