@@ -1,4 +1,4 @@
-文本溢出显示省略号
+# 文本溢出显示省略号
 
 1. 单行显示省略号
 
@@ -78,4 +78,7 @@ const Wrapper = styled.div``;
 
 效果:
 
-<video src="./css笔记.assets/录屏2024-01-07 下午5.54.45.mov" style="zoom:50%;"></video>
+<video src="./css笔记.assets/录屏2024-01-07 下午5.54.45.mov"></video>
+
+
+

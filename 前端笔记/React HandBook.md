@@ -26,4 +26,27 @@
 
 
 
- 
+# 清理API请求
+
+这点与 `React`本身无关,是属于`js`的知识
+
+因为在软件中如果一直获取 api 请求而不及时清理,会造成资源浪费,甚至是影响到整个程序的流畅性,一般会使用`AbortController`
+
+<img src="./React HandBook.assets/截屏2024-01-10 下午3.59.34.png" alt="截屏2024-01-10 下午3.59.34" style="zoom:40%;" />
+
+与`fetch`连接起来,在`useEffect`勾子中调用清理函数:
+
+```react
+import 'useEffect' from 'React'
+
+const controller = new AbortController();
+
+useEffect(() => {
+  // ... 
+
+  return () => {
+    controller.abort();
+  }
+}, [query])
+```
+
