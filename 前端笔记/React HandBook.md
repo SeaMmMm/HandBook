@@ -305,3 +305,375 @@ export default ProtectedRoute
 > 最后，`ProtectedRoute` 组件返回一个条件渲染。如果 `isAuthenticated` 是 `true`，我们就渲染 `children`，这是传递给 `ProtectedRoute` 的子元素。如果 `isAuthenticated` 是 `false`，我们就返回 `null`，这意味着不渲染任何东西。
 >
 > 总的来说，`ProtectedRoute` 组件的作用是：如果用户已经认证，就渲染子元素；如果用户未认证，就导航到登录页面，并不渲染任何东西。
+
+
+
+# 重复渲染现象及其解决方案
+
+`React` 的组件需要关注两个阶段
+
+1. 初始阶段渲染： 当组件第一次挂载时
+2. 重复渲染： 组件已挂载，需要更新组件的状态
+
+
+
+## 各种情况
+
+### 状态变化导致重复渲染
+
+在 `React` 中当组件的状态发生变化，就会重复渲染，这是 `React` 中组件更新的的内部机制，也是引起组件重复渲染的根本原因。
+
+![]( https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/00e7e6a4d5b94b3ebeaa79f6bbfdc711~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp? )
+
+### 父组件导致重复渲染
+
+当父组件重复渲染时，它的子组件都会跟着重新渲染。
+
+![]( https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4e5f14d0eeee408f8f62154af04c8ac1~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp? )
+
+### Context变化导致重复渲染
+
+当在使用 `Context` 时，如果 `Context Provider` 提供的 `value` 发生变化时，在所有使用 `Context` 数据的组件就会导致重复渲染，即使组件中只使用了 `Context` 中的部分数据也会导致重复渲染。
+
+![]( https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cfd61258ae0e4fd698268d5f0f0426c4~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp? )
+
+###  hook变化导致重复渲染
+
+在组件中使用 `hook` 时，当 `hook` 中状态发生变化，会导致组件的重复渲染，如果在 `hook` 中使用了 `Context` 和 `Context value` 时，也会导致组件的重复渲染。
+
+![]( https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ef687a1fbd2d453bba8e02848aa4e3e9~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp? )
+
+
+
+## 通过组合阻止重复渲染
+
+### ⛔️不要在渲染函数中创建组件
+
+在一个组件中的渲染函数中创建组件是最大的性能杀手，组件每一次重复渲染都会导致创建的组件销毁并重新创建，这就会比通常创建组件的性能差。
+
+![part3-creating-components.png](./React HandBook.assets/2272a2d522eb49168d32e3249e0a98c9~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+### ✅ 防止重复渲染 `move state down`
+
+当一个组件中一部分组件使用了 `state` ,而另一部分组件相对和 `state` 相对孤立，典型的例子就是打开 关闭 `dialog`的组件中，通常把使用 `state` 的组件单独提取成一个独立的组件，这样未使用 `state` 的组件就不会受到 `state` 的变化的影响
+
+~~**Bad**~~
+
+```jsx
+const Component = () => {
+  const [isOpen, setOpen] = useState(false)
+  return (
+    <div>
+        <button onClick={() => setOpen(!isOpen)}>open</button>
+        { isOpen && <ModalDialog />}
+        {/* 状态的变化会引起 SlowComponent 重复渲染 */}
+        <SlowComponent />
+    </div>
+  )
+}
+```
+
+**优化后**
+
+```jsx
+const Component = () => {
+  return (
+    <div>
+        <ButtonWithDialog />
+        <SlowComponent />
+    </div>
+  )
+}
+
+const ButtonWithDialog = () => {
+  const [isOpen, setOpen] = useState(false)
+  return (
+    <>
+        <button onClick={() => setOpen(!isOpen)}>open</button>
+        { isOpen && <ModalDialog />}
+    </>
+  )
+}
+```
+
+### ✅ 防止重复渲染 `children as props`
+
+有时无法轻易的把一个组件单独的独立提取出来，此时可以把带状态的组件提取出来，然后把耗时的组件作为 `children` props 传递给那个组件，这样也可以避免重复渲染
+
+~~**Bad**~~
+
+```jsx
+const FullComponent = () => {
+  const [state, setState] = useState(1);
+
+  const onClick = () => {
+    setState(state + 1);
+  };
+
+  return (
+    <div onClick={onClick} className="click-block">
+      <p>Click this component - "slow" component will re-render</p>
+      <p>Re-render count: {state}</p>
+      <VerySlowComponent />
+    </div>
+  );
+};
+```
+
+在父组件中点击会引起父组件状态变化，父组件需要渲染，对应的 `VerySlowComponent`
+
+**优化后**
+
+把带状态管理的组件提取出来，接收一个 `children` 属性
+
+```jsx
+const ComponentWithClick = ({ children }) => {
+  const [state, setState] = useState(1);
+  const onClick = () => {
+    setState(state + 1);
+  };
+  return (
+    <div onClick={onClick} className="click-block">
+      <p>Re-render count: {state}</p>
+      {children}
+    </div>
+  );
+};x
+jsx
+复制代码const SplitComponent = () => {
+  return (
+    <>
+      <ComponentWithClick>
+        <>
+          <p>Click the block - "slow" component will NOT re-render</p>
+          <VerySlowComponent />
+        </>
+      </ComponentWithClick>
+    </>
+  );
+};
+```
+
+### ✅ 防止重复渲染： `components as props`
+
+和上面的情况类似，把带状态管理的组件提取出来，把相对耗时的组件作为组件的 `props` 传递过去，`props` 不受状态变化的影响，所以可以避免耗时组件的重复渲染，适用于耗时组件不受状态变化的影响，又不能作为 `children` 属性传递
+
+~~**Bad**~~
+
+```jsx
+const FullComponent = () => {
+  const [state, setState] = useState(1);
+
+  const onClick = () => {
+    setState(state + 1);
+  };
+
+  return (
+    <div onClick={onClick} className="click-block">
+      <p>Click this component - "slow" component will re-render</p>
+      <p>Re-render count: {state}</p>
+      <VerySlowComponent />
+      <p>Something</p>
+      <AnotherSlowComponent />
+    </div>
+  );
+};
+```
+
+**优化后**
+
+```jsx
+const ComponentWithClick = ({ left, right }) => {
+  const [state, setState] = useState(1);
+
+  const onClick = () => {
+    setState(state + 1);
+  };
+
+  return (
+    <div onClick={onClick} className="click-block">
+      <p>Re-render count: {state}</p>
+      {left}
+      <p>Something</p>
+      {right}
+    </div>
+  );
+};
+
+// 把组件作为 props 传递给组件，这样耗时组件就不受点击事件的影响
+const SplitComponent = () => {
+  const left = (
+    <>
+      <h3>component with slow components passed as props</h3>
+      <p>Click the block - "slow" components will NOT re-render</p>
+      <VerySlowComponent />
+    </>
+  );
+  const right = <AnotherSlowComponent />;
+  return (
+    <>
+      <ComponentWithClick left={left} right={right} />
+    </>
+  );
+};
+```
+
+
+
+## 使用 `React.memo` 避免重复渲染
+
+使用 `React.memo` 可以有效的避免组件的重复渲染，但并不是使用了 `React.memo` 都可以避免重复渲染
+
+### ✅ `React.memo` 中带 `props` 的组件
+
+所有不是原始值的 `props` 都必须缓存起来，使用`React.memo`才能起作用，下面的例子中都使用了 `React.memo` ,但是第一个组件的 `props` 没有缓存，还是会重复渲染， 第二个由于 `props` 使用了缓存就不会引起重复渲染
+
+```jsx
+const Child = ({ value }) => {
+  console.log("Child re-renders", value.value);
+  return <>{value.value}</>;
+};
+
+const ChildMemo = React.memo(Child);
+
+const App = () => {
+  const [state, setState] = useState(1);
+
+  const onClick = () => {
+    setState(state + 1);
+  };
+
+  const memoValue = useMemo(() => ({ value: "second" }), []);
+
+  return (
+    <>
+      <p>first 组件还是会重复渲染</p>
+      <p>Second 不会重复渲染</p>
+
+      <button onClick={onClick}>click here</button>
+      <br />
+      <ChildMemo value={{ value: "first" }} />
+      <br />
+      <ChildMemo value={memoValue} />
+    </>
+  );
+};
+```
+
+### ✅ `React.memo`中有 `children` 或 `props`作为组件时
+
+当用 `React.memo` 封装的组件作为 `props` 或 `children`时，不能把 `React.memo` 作用到父组件上，下面的例子说明， **注意下面写法的区别**
+
+```jsx
+const Child = ({ value }) => {
+  console.log("Child re-renders", value.value);
+  return <>{value.value}</>;
+};
+
+const Parent = ({ left, children }) => {
+  return (
+    <div>
+      {left}
+      {children}
+    </div>
+  );
+};
+
+const ChildMemo = React.memo(Child);
+const ParentMemo = React.memo(Parent);
+
+const App = () => {
+  const [state, setState] = useState(1);
+  const onClick = () => {
+    setState(state + 1);
+  };
+  
+  const memoValue = useMemo(() => ({ value: "memoized" }), []);
+
+  return (
+    <>
+      <button onClick={onClick}>click here</button>
+      {/*虽然父组件使用 React.memo, 但是如果使用 props children 接收组件时，不起作用，点击时依然会重复渲染*/}
+      <ParentMemo
+        left={<Child value={{ value: "left child of ParentMemo" }} />}
+      >
+        <Child value={{ value: "child of ParentMemo" }} />
+      </ParentMemo>
+
+      {/* props children 传递组件，需用 React.memo 封装才能避免点击时重复渲染 */}
+      <Parent left={<ChildMemo value={memoValue} />}>
+        <ChildMemo value={memoValue} />
+      </Parent>
+    </>
+  );
+};
+```
+
+## 使用 `useCallback` `useMemo`
+
+单纯的缓存 `props` 并不会避免子组件的重复渲染
+
+```jsx
+const Child = ({ value }) => {
+  console.log("Child re-renders", value.value);
+  return <>{value.value}</>;
+};
+
+
+const App = () => {
+  const [state, setState] = useState(1);
+  const onClick = () => {
+    setState(state + 1);
+  };
+  
+  const memoValue = useMemo(() => ({ value: "child" }), []);
+  return (
+    <>
+      <button onClick={onClick}>click here</button>
+      <br />
+      <br />
+      {/* 单纯的缓存 props，Child 在点击时，依然会重复渲染 */}
+      <Child value={memoValue} />
+    </>
+  );
+};
+```
+
+### ✅ 必要的 `userMemo` `useCallback`
+
+如果子组件使用了 `React.memo` 封装，那么子组件的所有的 非原始值的 `props` 必须缓存
+
+![part5-necessary-usememo-props.png](./React HandBook.assets/d9fbac56bd254afe80fa9d25d1ee86f4~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+如果组件在 `useEffect` `useMemo` `useCallback` 中使用非原始值作为依赖项 `dependency` ，那也应该使用缓存
+
+![part5-necessary-usememo-props.png](./React HandBook.assets/2a5ff773b21e40b6aa63b461cedb99dc~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+## 避免 `Context` 提供的数据引起重复渲染
+
+### ✅ 缓存 `Provider` 提供的数据
+
+![part7-context-provider-memo.png](./React HandBook.assets/889cc7d54b19442d8e7257b5611ba4b4~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+### ✅ 将读取，写入数据分割成不同的 `Provider`
+
+![part7-context-split-api.png](./React HandBook.assets/4b1faa35b16848cdaa2a352c91dbb9d1~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+### ✅ 将数据分割成小的 `Provider`
+
+![part7-context-split-data (1).png](./React HandBook.assets/c9b184f25dc54fcc8d62e31ce4fe7364~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+
+
+> 这里来看看上面用到的一些钩子函数在官网的解释
+>
+> **`useMemo`:** [useMemo](https://react.docschina.org/reference/react/useMemo)
+>
+> <img src="./React HandBook.assets/image-20240116下午90402337.png" alt="image-20240116下午90402337" style="zoom:40%;" />
+>
+> **`useCallback`**:[useCallback](https://react.docschina.org/reference/react/useCallback)
+>
+> <img src="./React HandBook.assets/image-20240116下午90520088.png" alt="image-20240116下午90520088" style="zoom:33%;" />
+
+
+
