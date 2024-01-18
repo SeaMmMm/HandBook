@@ -72,7 +72,7 @@ useEffect(() => {
 
 # `useContext`和`useReducer`结合使用实例
 
-```js
+```jsx
 import {
   createContext,
   useEffect,
@@ -308,7 +308,7 @@ export default ProtectedRoute
 
 
 
-# 重复渲染现象及其解决方案
+# `re-render`导致程序卡顿
 
 `React` 的组件需要关注两个阶段
 
@@ -665,7 +665,7 @@ const App = () => {
 
 
 
-> 这里来看看上面用到的一些钩子函数在官网的解释
+> 上面的一些钩子函数
 >
 > **`useMemo`:** [useMemo](https://react.docschina.org/reference/react/useMemo)
 >
@@ -674,6 +674,11 @@ const App = () => {
 > **`useCallback`**:[useCallback](https://react.docschina.org/reference/react/useCallback)
 >
 > <img src="./React HandBook.assets/image-20240116下午90520088.png" alt="image-20240116下午90520088" style="zoom:33%;" />
+>
+> **`memo`:**
+>
+> <img src="./React HandBook.assets/image-20240116下午95902017.png" alt="image-20240116下午95902017" style="zoom:40%;" />
 
+## 总结
 
-
+<img src="./React HandBook.assets/image-20240117上午103445827.png" alt="image-20240117上午103445827" style="zoom:33%;" />
