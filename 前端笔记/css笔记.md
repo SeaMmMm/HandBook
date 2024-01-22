@@ -82,3 +82,54 @@ const Wrapper = styled.div``;
 
 
 
+
+
+# Step1 Natours
+
+## 多边形剪切效果
+
+这里用到的是：`clip-path` 属性，用法一般是：` clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%)`
+
+四个参数分别代表每个矩形的四个角，从左上顺时针旋转
+
+每个参数都有两个值，分别代表 x 轴和 y 轴的偏移量：
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8860315475-5917810.png" alt="image-20240122下午60315475" style="zoom: 50%;" />
+
+本项目中不添加这个的样子：
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8860440872.png" alt="image-20240122下午60440872" style="zoom:20%;" />
+
+添加后：
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8860507129.png" alt="image-20240122下午60507129" style="zoom:25%;" />
+
+
+
+## 位置居中的一个方法
+
+就像上面的那个单词：`OUTDOORS` 和下面的一行单词居于这个背景图片的中间，这里使用的是绝对布局，把这个背景图片设置成相对定位，字设置成绝对定位：
+
+```css
+.text-box {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+```
+
+这里用了`top: 40%; left: 50%`，形成的效果是这样的：
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8895817230.png" alt="image-20240122下午95817230" style="zoom:25%;" />
+
+加上这句：`transform: translate(-50%, -50%);`，马上就得到我们想要的样子：
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8895906208.png" alt="image-20240122下午95906208" style="zoom:25%;" />
+
+为什么？
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%88101745015.png" alt="image-20240122下午101745015" style="zoom: 50%;" />
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%88101836665.png" alt="image-20240122下午101836665" style="zoom:50%;" />
