@@ -135,6 +135,38 @@ article p:last-child {
 
 
 
+## Box model
+
+![image-20240124下午34857335](./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%8834857335.png)
+
+> :information_desk_person:`width:100%`中 100% 是相对于父元素的大小而定的。
+>
+> 子元素永远不可能比父元素宽
+
+根据盒模型，就有一个简单的使元素居中的方法
+
+```html
+<div class='container'>
+  <p> ... </p>
+  <a> ... </a>
+  <h1> ... </h1>
+   <!-- //other element -->
+</div>
+```
+
+```css
+.container {
+  width: 800px;
+  margin: 0 auto;
+}
+```
+
+在上面的 container 中包含一些子元素，这些元素都在 `div` 里居中
+
+`margin: 0 auto` 指 div 上下的边距为 0，左右边距为 auto，意思是让浏览器自动计算左右的边距，因此浏览器会让左右的边距都相等，因此可以达到元素居中的效果
+
+:eyes: 但有个问题，用这种方法居中要设置一个宽度，如果浏览器窗口小于这个宽度的时候这种居中的效果就没有了
+
 
 
 # Advanced Css
