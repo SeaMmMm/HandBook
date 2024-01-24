@@ -1,3 +1,7 @@
+[TOC]
+
+
+
 # 文本溢出显示省略号
 
 1. 单行显示省略号
@@ -76,17 +80,68 @@ const Wrapper = styled.div``;
 
 ```
 
-效果:
-
-<video src="./css笔记.assets/录屏2024-01-07 下午5.54.45.mov"></video>
 
 
+# Basic Css
+
+## 一些伪类
+
+### `:first-child :last-child :nth-child()`
+
+```css
+li:first-child {
+  /* ... */
+}
+```
+
+`:first-child` 选择父元素中下一个孩子，`last-child` 选择父元素中的最后一个孩子，`nth-child()` 括号中数字代指第几个孩子
+
+`nth-child(odd)`选择所有的奇数子元素，`nth-child(even)`相反，选择所有偶数子元素
+
+如果是这种情况：
+
+```css
+article p:last-child {
+  /* ... */
+}
+```
+
+这里意思就变成了在 `article` 这个父元素中，找到他的一个子元素 `p` ，并且这个元素是他的最后一个子元素
 
 
 
-# Step1 Natours
+### `:link :visited :hover :active`
 
-## 多边形剪切效果
+这几个伪类都是给超链接用的，除了`:hover` 在其他地方也经常使用
+
+- `:link` 设置超链接的一般样式
+- `:visited` 设置在超链接在访问过后显示的样子
+- `:hover` 设置鼠标悬停在超链接上方时的样式
+- `:active` 设置鼠标点击超链接时的样子
+
+>  ⚠️注意，最好就是按照这几个顺序写样式-- "LVHA" 打乱顺序的话可能会出现莫名其妙的问题
+
+
+
+## 优先级
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%88122510089.png" alt="image-20240124下午122510089"  />
+
+
+
+## 继承
+
+![image-20240124下午123441808](./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%88123441808.png)
+
+
+
+
+
+# Advanced Css
+
+## Step1 Natours
+
+### 多边形剪切效果
 
 这里用到的是：`clip-path` 属性，用法一般是：` clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%)`
 
@@ -106,7 +161,7 @@ const Wrapper = styled.div``;
 
 
 
-## 位置居中的一个方法
+### 位置居中的一个方法
 
 就像上面的那个单词：`OUTDOORS` 和下面的一行单词居于这个背景图片的中间，这里使用的是绝对布局，把这个背景图片设置成相对定位，字设置成绝对定位：
 
@@ -133,3 +188,7 @@ const Wrapper = styled.div``;
 <img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%88101745015.png" alt="image-20240122下午101745015" style="zoom: 50%;" />
 
 <img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%88101836665.png" alt="image-20240122下午101836665" style="zoom:50%;" />
+
+
+
+​	
