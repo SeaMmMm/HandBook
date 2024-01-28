@@ -21,6 +21,11 @@ Object.assign(user, permissions1, permissions2)
 console.log(user)
 
 // 深拷贝
+/**
+ *
+ * @param {any} target
+ * @returns {any} cloned target
+ */
 function deepClone(target) {
   const map = new WeakMap()
 
