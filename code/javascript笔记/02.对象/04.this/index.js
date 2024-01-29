@@ -84,3 +84,82 @@ function makeUser() {
 let user3 = makeUser()
 
 console.log(user3.ref()) // John
+
+/*
+创建一个计算器
+重要程度: 5
+创建一个有三个方法的 calculator 对象：
+
+read() 提示输入两个值，并将其保存为对象属性，属性名分别为 a 和 b。
+sum() 返回保存的值的和。
+mul() 将保存的值相乘并返回计算结果。
+let calculator = {
+  // ……你的代码……
+};
+
+calculator.read();
+alert( calculator.sum() );
+alert( calculator.mul() );
+*/
+let calculator = {
+  sum() {
+    return this.a + this.b
+  },
+
+  mul() {
+    return this.a * this.b
+  },
+
+  read() {
+    this.a = +prompt('a?', 0)
+    this.b = +prompt('b?', 0)
+  },
+}
+
+/*
+链式（调用）
+重要程度: 2
+有一个可以上下移动的 ladder 对象：
+
+let ladder = {
+  step: 0,
+  up() {
+    this.step++;
+  },
+  down() {
+    this.step--;
+  },
+  showStep: function() { // 显示当前的 step
+    alert( this.step );
+  }
+};
+现在，如果我们要按顺序执行几次调用，可以这样做：
+
+ladder.up();
+ladder.up();
+ladder.down();
+ladder.showStep(); // 1
+ladder.down();
+ladder.showStep(); // 0
+修改 up，down 和 showStep 的代码，让调用可以链接，就像这样：
+
+ladder.up().up().down().showStep().down().showStep(); // 展示 1，然后 0
+这种方法在 JavaScript 库中被广泛使用。
+*/
+
+let ladder = {
+  step: 0,
+  up() {
+    this.step++
+    return this
+  },
+  down() {
+    this.step--
+    return this
+  },
+  showStep: function () {
+    // 显示当前的 step
+    alert(this.step)
+    return this
+  },
+}
