@@ -84,6 +84,12 @@ const Wrapper = styled.div``;
 
 # Basic Css
 
+## 选择器
+
+### 分组
+
+
+
 
 
 ## 一些伪类
@@ -526,80 +532,155 @@ h2::after {
 
 ### FlexBox
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Advanced Css
-
-## Step1 Natours
-
-### 多边形剪切效果
-
-这里用到的是：`clip-path` 属性，用法一般是：` clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%)`
-
-四个参数分别代表每个矩形的四个角，从左上顺时针旋转
-
-每个参数都有两个值，分别代表 x 轴和 y 轴的偏移量：
-
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8860315475-5917810.png" alt="image-20240122下午60315475" style="zoom: 50%;" />
-
-本项目中不添加这个的样子：
-
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8860440872.png" alt="image-20240122下午60440872" style="zoom:20%;" />
-
-添加后：
-
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8860507129.png" alt="image-20240122下午60507129" style="zoom:25%;" />
-
-
-
-### 位置居中的一个方法
-
-就像上面的那个单词：`OUTDOORS` 和下面的一行单词居于这个背景图片的中间，这里使用的是绝对布局，把这个背景图片设置成相对定位，字设置成绝对定位：
-
 ```css
-.text-box {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 ```
 
-这里用了`top: 40%; left: 50%`，形成的效果是这样的：
+![image-20240130上午112512880](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8A%E5%8D%88112512880.png)
 
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8895817230.png" alt="image-20240122下午95817230" style="zoom:25%;" />
+> 中间那个 css 标签那么高是因为给他设置了高度的
 
-加上这句：`transform: translate(-50%, -50%);`，马上就得到我们想要的样子：
+1. **`display: flex;`：**
+   - 此规则将 `.container` 元素指定为 Flex 容器，使其内部的直接子元素成为 Flex 项目。
 
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%8895906208.png" alt="image-20240122下午95906208" style="zoom:25%;" />
+2. **`align-items: center;`：**
+   - 此规则将 Flex 项目在交叉轴上（垂直轴，因为默认 `flex-direction` 为 `row`）居中对齐。也就是说，Flex 项目将在垂直方向上相对于容器居中。
 
-为什么？
+3. **`justify-content: space-between;`：**
+   - 此规则将 Flex 项目在主轴上（水平轴，因为默认 `flex-direction` 为 `row`）分散对齐。容器内的空间将在 Flex 项目之间均匀分布，使得第一个项目位于容器的起始端，最后一个项目位于容器的末尾端。
 
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%88101745015.png" alt="image-20240122下午101745015" style="zoom: 50%;" />
+综合起来，这段 CSS 代码创建了一个 Flex 容器 `.container`，其中包含的 Flex 项目在垂直方向上居中对齐，水平方向上则均匀分布在容器两侧。这种布局经常用于创建水平导航栏、页眉、页脚等。
 
-<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240122%E4%B8%8B%E5%8D%88101836665.png" alt="image-20240122下午101836665" style="zoom:50%;" />
+> ==**align-items 和 align-content 的区别**==
+>
+> `align-items` 和 `align-content` 是 Flexbox 布局中用于控制交叉轴上对齐方式的两个属性，它们有一些区别：
+>
+> 1. **`align-items`：**
+>    - 用于设置 Flex 容器内的所有 Flex 项目在交叉轴上的对齐方式。
+>    - 具体来说，它影响 Flex 容器内的每个行（在默认的 `flex-direction: row` 情况下）或每列（在 `flex-direction: column` 情况下）中的 Flex 项目的对齐方式。
+>    - 值可以是 `flex-start`、`flex-end`、`center`、`baseline` 或 `stretch`。
+>
+>      ```css
+>      .flex-container {
+>        align-items: center; /* 或其他值，如flex-start、flex-end、baseline、stretch */
+>      }
+>      ```
+>
+> 2. **`align-content`：**
+>    - 用于设置多行（或多列）的 Flex 项目在交叉轴上的对齐方式。
+>    - 当 Flex 容器有多行（`flex-wrap: wrap`）或多列时，`align-content` 控制这些行或列之间的对齐方式。
+>    - 值可以是 `flex-start`、`flex-end`、`center`、`space-between`、`space-around` 或 `stretch`。
+>
+>      ```css
+>      .flex-container {
+>        align-content: space-between; /* 或其他值，如flex-start、flex-end、center、space-around、stretch */
+>      }
+>      ```
+>
+> 综述来说，`align-items` 控制 Flex 容器内单个行或列的对齐方式，而 `align-content` 控制多行（或多列）之间的对齐方式。在大多数情况下，`align-items` 更常用，因为它可以在单个行或列上定位 Flex 项目，而 `align-content` 更适合在容器有多行或多列时对它们进行整体调整。
 
 
 
-​	
+> ==**justify-content 和 justify-items 的区别**==
+>
+> 在 Flexbox 布局中，`justify-content` 和 `justify-items` 是用于控制主轴上对齐方式的两个属性，但它们分别应用于不同的层级。
+>
+> 1. **`justify-content`：**
+>    
+>    - 用于设置 Flex 容器内的所有 Flex 项目在主轴上的对齐方式。
+>    - 具体来说，它影响 Flex 容器内的每行（在默认的 `flex-direction: row` 情况下）或每列（在 `flex-direction: column` 情况下）中的 Flex 项目的对齐方式。
+>    - 值可以是 `flex-start`、`flex-end`、`center`、`space-between`、`space-around` 或 `space-evenly`。
+>    
+>      ```css
+>      .flex-container {
+>        justify-content: space-between; /* 或其他值，如flex-start、flex-end、center、space-around、space-evenly */
+>      }
+>      ```
+>    
+> 2. **`justify-items`：**
+>    - 与 `justify-content` 不同，`justify-items` 是应用于 Flex 容器内的所有 Flex 项目的属性。
+>    - 它设置每个 Flex 项目在主轴上的对齐方式，覆盖了单个项目上的 `justify-self` 属性（如果有的话）。
+>    - 值可以是 `start`、`end`、`center`、`stretch`。
+>
+>      ```css
+>      .flex-container {
+>        justify-items: center; /* 或其他值，如start、end、stretch */
+>      }
+>      ```
+>
+> 综述来说，`justify-content` 控制 Flex 容器内单个行或列的对齐方式，而 `justify-items` 控制 Flex 容器内所有项目的对齐方式。通常情况下，`justify-content` 更为常用，因为它可以在单个行或列上定位 Flex 项目，而 `justify-items` 更适合在容器内对所有项目进行整体调整。请注意，`justify-items` 在 CSS Grid 布局中也有类似的作用，但在 Flexbox 中的应用相对较少。
+
+![image-20240130下午32705272](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%8832705272.png)
+
+
+
+```css
+.el--1 {
+  align-self: flex-start;
+}
+```
+
+![image-20240130下午33325979](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%8833325979.png)
+
+`align-self` 是 Flexbox 布局中用于设置单个 Flex 项目在交叉轴上对齐方式的属性。具体来说，它覆盖了容器上的 `align-items` 属性，允许你为特定的 Flex 项目定义独立的交叉轴对齐方式。
+
+在上述代码中，`.el--1` 类的 Flex 项目将在交叉轴上使用 `flex-start` 进行对齐。这意味着该项目将位于容器交叉轴的起始端。
+
+具体的 `align-self` 可选值包括：
+
+- **`auto`：** 使用父容器的 `align-items` 属性值。
+- **`flex-start`：** 在交叉轴的起始端对齐。
+- **`flex-end`：** 在交叉轴的末尾端对齐。
+- **`center`：** 在交叉轴的中心对齐。
+- **`baseline`：** 在基线上对齐。
+- **`stretch`：** 沿交叉轴拉伸以适应容器。
+
+这个属性对于需要个别调整 Flex 项目在交叉轴上的位置而不影响其他项目的情况非常有用。
+
+
+
+```css
+.el--6{
+  order: -1;
+}
+```
+
+`order` 属性用于指定 Flex 项目在 Flex 容器内的排列顺序。
+
+在这里，`order: -1;` 的负值意味着 `.el--6` 会被放置在默认排序之前。默认情况下，Flex 项目的 `order` 值为 `0`，表示它们按照它们在源代码中出现的顺序排列。通过为特定项目设置不同的 `order` 值，你可以改变它们的排列顺序。
+
+如果其他 Flex 项目的 `order` 值为默认值（`0`），那么`.el--6` 将被移动到 Flex 容器中的开头，即在排列上会出现在那些 `order` 值为非负数的项目之前。
+
+请注意，`order` 的实际值并不重要，而是相对于其他项目的值。比如，如果 `.el--6` 的 `order` 为 `-1`，而其他项目的 `order` 为 `1` 和 `2`，那么`.el--6` 仍然会在它们之前排列，因为 `-1` 小于 `1` 和 `2`。
+
+
+
+```css
+.el {
+  /* DEFAULTS: */
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+}
+```
+
+1. **`flex-grow: 0;`：**
+   - `flex-grow` 定义了 Flex 项目在主轴上的扩展能力。当容器的剩余空间大于项目所需的空间时，项目将根据 `flex-grow` 的值进行分配。在这里，`flex-grow: 0` 表示 `.el` 这个项目不会扩展，即不会占用多余的空间。
+   - **值 大于 `0`：** 表示项目可以在剩余空间中扩展。具体值确定了扩展的相对比例。如果有多个具有不同 `flex-grow` 值的项目，它们将根据这个比例分配额外的空间。
+2. **`flex-shrink: 1;`：**
+   - `flex-shrink` 定义了 Flex 项目在主轴上的收缩能力。当容器的空间不足以容纳所有项目时，项目将根据 `flex-shrink` 的值进行收缩。在这里，`flex-shrink: 1` 表示 `.el` 这个项目会按照默认比例进行收缩，以适应容器的可用空间。
+   - **值 小于 `1`：** 表示项目收缩的速度相对较慢。值越小，收缩的幅度越小。
+   - **`flex-shrink: 0;`：** 项目不会收缩。即使容器的空间不足以容纳所有项目，拥有 `flex-shrink: 0;` 的项目也不会按照默认比例收缩。它将保持其初始大小，不会减小。
+3. **`flex-basis: auto;`：**
+   - `flex-basis` 定义了 Flex 项目在主轴上的初始大小。`auto` 表示 `.el` 的初始大小由其内容和/或固定尺寸决定。如果你设置了一个具体的长度值（如 `flex-basis: 200px;`），那么项目将以这个值作为初始大小。
+   - **值 具体的长度值（如 `flex-basis: 200px;`）：** 表示项目的初始大小将被设置为指定的长度值。无论容器的大小如何，项目都会始终具有这个初始大小。
+
+综合起来，这组默认值的含义是：
+
+- `.el` 这个项目不会主动扩展（`flex-grow: 0`）。
+- 如果容器的空间不足，`.el` 会按照默认比例进行收缩（`flex-shrink: 1`）。
+- `.el` 的初始大小由其内容和/或固定尺寸决定（`flex-basis: auto`）。
