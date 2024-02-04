@@ -86,9 +86,7 @@ const Wrapper = styled.div``;
 
 ## 选择器
 
-### 属性选择器
-
-#### 简单属性选择器
+### 简单属性选择器
 
 ![image-20240130下午103216568](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%88103216568.png)
 
@@ -109,25 +107,25 @@ h1[important] {
 
 
 
-#### 根据具体属性值选择
+### 根据具体属性值选择
 
 ![image-20240130下午103812237](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%88103812237.png)
 
 
 
-#### 根据部分属性值选择
+### 根据部分属性值选择
 
 ![image-20240130下午104045529](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%88104045529.png)
 
 
 
-#### 选择子元素
+### 选择子元素
 
 ![image-20240131上午92737497](./css%E7%AC%94%E8%AE%B0.assets/image-20240131%E4%B8%8A%E5%8D%8892737497.png)
 
 
 
-#### 选择相邻兄弟元素
+### 选择相邻兄弟元素
 
 ![image-20240131上午100658721](./css%E7%AC%94%E8%AE%B0.assets/image-20240131%E4%B8%8A%E5%8D%88100658721.png)
 
@@ -387,17 +385,25 @@ h2::after {
 
 ## 结构和层叠
 
-
-
-## 优先级
+### 优先级
 
 <img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%88122510089.png" alt="image-20240124下午122510089"  />
 
 
 
-## 继承
+### 继承
 
 ![image-20240124下午123441808](./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%88123441808.png)
+
+有一个文档树结构：
+
+![image-20240202上午95719070](./css%E7%AC%94%E8%AE%B0.assets/image-20240202%E4%B8%8A%E5%8D%8895719070.png)
+
+将声明 `color:gray` 应用到 `ul`元素时，这个元素就会采用这个声明，并且该值会再沿着树向下传播到后代元素，并且一直继续，直到再没有更多的后代元素继承这个值为止。
+
+值绝对不会向上传递，也就是说，元素不会把值向上传递到其祖先。
+
+> 注意：在HTML 中，对于向上传播规则有一个例外：应用到body元素的背景样式可以传递到 html 元素（html 是文档的根元素），相应地可以定义其画布。
 
 
 
@@ -758,3 +764,54 @@ h2::after {
 - `.el` 这个项目不会主动扩展（`flex-grow: 0`）。
 - 如果容器的空间不足，`.el` 会按照默认比例进行收缩（`flex-shrink: 1`）。
 - `.el` 的初始大小由其内容和/或固定尺寸决定（`flex-basis: auto`）。
+
+
+
+### Grid
+
+```css
+.container {
+  display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: 1fr 1fr;
+}
+```
+
+`display: grid` 声明使用 grid 布局。`grid-template-columns: repeat(4, 1fr);`设置列数，后面那个`repeat(4, 1fr)`重复 4 列，每一列自动调整宽度（每一列等宽）。与`1fr 1fr 1fr 1fr`一个意思。
+
+
+
+```css
+.container {
+  column-gap: 20px;
+	row-gap: 20px;
+}
+```
+
+设置间距
+
+<img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240203%E4%B8%8A%E5%8D%88115944025.png" alt="image-20240203上午115944025" style="zoom:25%;" />
+
+`column-gap` 设置列与列之间的，后面那个设置行与行之间的
+
+
+
+```css
+.el--1 {
+	grid-row: 1 / 3;
+	grid-column: 1 / 3;
+}
+```
+
+这个属性是用在表格布局的每一个子元素中的
+
+`grid-row: 1 / 3` 的意思：让这个元素处于第一行，并且跨越到第三个间隔（也就是跨越 2 个格子）`grid-column`同理。就会像这样：
+
+![image-20240203下午120422633](./css%E7%AC%94%E8%AE%B0.assets/image-20240203%E4%B8%8B%E5%8D%88120422633.png)
+
+还有
+
+- `grid-row: 1 / span 2`指的是让他处于第一行，并且跨越两个格子
+- `grid-row: 1 / -1`。这种后面是负数的话，就代表让他跨越到做这一行的最后一个格子，这通常用于不知道具体列数的情况下。
+
+想要对齐每个格子中的元素就可以使用`align-self`以及`justify-self`属性
