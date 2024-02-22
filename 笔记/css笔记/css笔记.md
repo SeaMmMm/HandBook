@@ -82,11 +82,15 @@ const Wrapper = styled.div``;
 
 
 
-# Basic Css
 
-## 选择器
 
-### 简单属性选择器
+----
+
+
+
+# 选择器
+
+## 简单属性选择器
 
 ![image-20240130下午103216568](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%88103216568.png)
 
@@ -107,33 +111,33 @@ h1[important] {
 
 
 
-### 根据具体属性值选择
+## 根据具体属性值选择
 
 ![image-20240130下午103812237](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%88103812237.png)
 
 
 
-### 根据部分属性值选择
+## 根据部分属性值选择
 
 ![image-20240130下午104045529](./css%E7%AC%94%E8%AE%B0.assets/image-20240130%E4%B8%8B%E5%8D%88104045529.png)
 
 
 
-### 选择子元素
+## 选择子元素
 
 ![image-20240131上午92737497](./css%E7%AC%94%E8%AE%B0.assets/image-20240131%E4%B8%8A%E5%8D%8892737497.png)
 
 
 
-### 选择相邻兄弟元素
+## 选择相邻兄弟元素
 
 ![image-20240131上午100658721](./css%E7%AC%94%E8%AE%B0.assets/image-20240131%E4%B8%8A%E5%8D%88100658721.png)
 
 
 
-## 伪类
+# 伪类
 
-### `:first-child :last-child :nth-child()`
+## `:first-child :last-child :nth-child()`
 
 ```css
 li:first-child {
@@ -161,7 +165,7 @@ article p:last-child {
 
 
 
-### `:link :visited :hover :active`
+## `:link :visited :hover :active`
 
 这几个伪类都是给超链接用的，除了`:hover` 在其他地方也经常使用
 
@@ -174,7 +178,7 @@ article p:last-child {
 
 
 
-### 根据语言选择
+## 根据语言选择
 
 有些情况想根据元素的语言来选择，这个时候就可以使用 `:lang()` 伪类。
 
@@ -188,7 +192,7 @@ article p:last-child {
 
 
 
-### 结合伪类
+## 结合伪类
 
 可以在同一个选择器中结合使用伪类。
 
@@ -196,7 +200,7 @@ article p:last-child {
 
 
 
-## 伪元素
+# 伪元素
 
 > 伪元素能够在文档中插入假想的元素，从而得到某种效果。
 >
@@ -206,7 +210,7 @@ article p:last-child {
 
 
 
-### `::first-letter`
+## `::first-letter`
 
 ```css
 h1::first-letter {
@@ -219,7 +223,7 @@ h1::first-letter {
 
 
 
-### `::first-line`
+## `::first-line`
 
 选中第一行
 
@@ -244,7 +248,7 @@ h1::first-letter {
 
 
 
-### `::before  ::after`
+## `::before  ::after`
 
 ==用的最多的伪元素==
 
@@ -301,7 +305,7 @@ h2::after {
 
 
 
-### 插曲
+## 插曲
 
 在上面的第六点中,`display`的作用还能展开讲很多, chat-gpt 给出的解释:
 
@@ -383,15 +387,15 @@ h2::after {
 
 
 
-## 结构和层叠
+# 结构和层叠
 
-### 优先级
+## 优先级
 
 <img src="./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%88122510089.png" alt="image-20240124下午122510089"  />
 
 
 
-### 继承
+## 继承
 
 ![image-20240124下午123441808](./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%88123441808.png)
 
@@ -407,7 +411,7 @@ h2::after {
 
 
 
-## Box model
+# Box model
 
 ![image-20240124下午34857335](./css%E7%AC%94%E8%AE%B0.assets/image-20240124%E4%B8%8B%E5%8D%8834857335.png)
 
@@ -441,7 +445,7 @@ h2::after {
 
 
 
-## Position
+# Position
 
 用的较多的有`absolute`和`relative`两种定位,其他的还有`fixed`等等.
 
@@ -453,9 +457,9 @@ h2::after {
 
 
 
-## 布局
+# 布局
 
-### 概述
+## 概述
 
 
 
@@ -467,7 +471,7 @@ h2::after {
 
 
 
-### float
+## float
 
 ```css
 .author-img {
@@ -572,7 +576,7 @@ h2::after {
 
 
 
-### Box-Sizing
+## Box-Sizing
 
  ![image-20240126下午101542803](./css%E7%AC%94%E8%AE%B0.assets/image-20240126%E4%B8%8B%E5%8D%88101542803.png)
 
@@ -610,7 +614,7 @@ h2::after {
 
 
 
-### FlexBox
+## FlexBox
 
 ```css
 .container {
@@ -767,7 +771,7 @@ h2::after {
 
 
 
-### Grid
+## Grid
 
 ```css
 .container {
