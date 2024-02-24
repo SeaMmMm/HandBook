@@ -60,11 +60,3 @@ finally 的功能是设置一个处理程序在前面的操作完成后，执行
 
 把它想象成派对的终结者。无论派对是好是坏，有多少朋友参加，我们都需要（或者至少应该）在它之后进行清理。
 */
-
-function delay(ms) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve()
-    }, ms)
-  })
-}
