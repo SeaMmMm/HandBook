@@ -96,5 +96,5 @@ new Promise(function () {
 
 JavaScript 引擎会跟踪此类 rejection，在这种情况下会生成一个全局的 error。如果你运行上面这个代码，你可以在控制台中看到。
 
-在浏览器中，我们可以使用 unhandledrejection 事件来捕获这类 error：
+在浏览器中，我们可以使用 unhandledrejection 事件来捕获这类 error
 */
