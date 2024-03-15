@@ -10,12 +10,14 @@
 // 溢出隐藏
 overflow: hidden;
 // 溢出的文本呈现为省略号
-text-overflow:ellipsis;
+text-overflow: ellipsis;
 // 禁止文本换行
 white-space: nowrap;
 ```
 
-效果:![image-20240107下午52108372](./css笔记.assets/image-20240107下午52108372.png)
+效果:
+
+<img src="./css笔记.assets/image-20240107下午52108372.png" alt="image-20240107下午52108372" style="zoom:200%;" />
 
 <img src="./css笔记.assets/image-20240107下午52128300.png" alt="image-20240107下午52128300" style="zoom:25%;" />
 
@@ -189,8 +191,6 @@ article p:last-child {
   font-style: italic;
 }
 ```
-
-
 
 ## 结合伪类
 
@@ -819,3 +819,40 @@ h2::after {
 - `grid-row: 1 / -1`。这种后面是负数的话，就代表让他跨越到做这一行的最后一个格子，这通常用于不知道具体列数的情况下。
 
 想要对齐每个格子中的元素就可以使用`align-self`以及`justify-self`属性
+
+
+
+# 组件
+
+## 手风琴
+
+效果图：
+
+![image-20240313上午101141281](./css%E7%AC%94%E8%AE%B0.assets/image-20240313%E4%B8%8A%E5%8D%88101141281.png)
+
+布局使用 `flex`，设置好长宽高
+
+1. 图片样式
+
+```css
+transform: scale(1.2);
+padding-left: 86px;
+box-shadow: 0 12px 12px rgba(0, 0, 0, 0.25);
+```
+
+ `transform: scale(1.2);` 将图片放大
+
+2. 调整按钮的位置
+
+```css
+position: absolute;
+top: 50%;
+transform: translate(-50%, -50%);
+```
+
+先使按钮为绝对定位，`top:50%`让它向下移动到父元素中间的位置，后面`transform: translate(-50%, -50%)`调整自身。
+
+
+
+## 表单
+
