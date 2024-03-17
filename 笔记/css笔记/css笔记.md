@@ -824,6 +824,10 @@ h2::after {
 
 # 组件
 
+> 下面只会给出部分关键实现代码
+
+
+
 ## 手风琴
 
 效果图：
@@ -855,4 +859,24 @@ transform: translate(-50%, -50%);
 
 
 ## 表单
+
+![image-20240315下午33352718](./css%E7%AC%94%E8%AE%B0.assets/image-20240315%E4%B8%8B%E5%8D%8833352718.png)
+
+其实就是用 `grid` 实现布局，其中有个好的点：
+
+```css
+tbody tr:nth-child(odd) {
+  background-color: #f8f9fa;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #e9ecef;
+}
+```
+
+很简洁的使奇数和偶数层背景颜色分开
+
+
+
+## 分页
 
