@@ -1,3 +1,4 @@
 {
-  "cSpell.enableFiletypes": ["!javascript"]
+  "cSpell.enableFiletypes": ["!javascript"],
+  "docwriter.style": "Auto-detect"
 }
