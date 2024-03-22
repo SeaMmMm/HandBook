@@ -201,7 +201,7 @@ Function.prototype.newBind = function () {
 // 4. apply即可 => newThis
 Function.prototype.newApply = function (context) {
   // 函数监测
-  if (typeof this !== 'funtion') {
+  if (typeof this !== 'function') {
     throw new Error('type error')
   }
 
