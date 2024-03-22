@@ -1,29 +1,38 @@
-/* 
-  func.bind(obj, arg1 ~ argn) => func 的 this 指向 obj， 并返回一个可执行函数（已经替换成的）
- */
-Function.prototype.myBind = function () {
-  const _this = this
-  const args = Array.prototype.slice.call(arguments)
-  const newThis = args.shift()
+const obj1 = {
+  a: 1,
+  b: {
+    c: 111,
+    d: 222,
+    g: 333,
+  },
+  e: {
+    g: 333,
+  },
+}
 
-  return function () {
-    return _this.newApply(newThis, args)
+const obj2 = {
+  a: 1,
+  c: 'sss',
+  b: {
+    c: 1111,
+    d: 222,
+    f: 333,
+  },
+  e: {
+    g: 23,
+  },
+}
+
+function mergeObj(obj1, obj2) {
+  const obj1K = Object.keys(obj1)
+
+  for (let i = 0; i < obj1K.length; i++) {
+    if (typeof obj1[obj1K[i]] !== 'object') {
+      obj1[obj1K[i]] = obj2[obj1K[i]] ? obj2[obj1K[i]] : obj1[obj1K[i]]
+    } else {
+      obj1[obj1K[i]] = { ...obj1[obj1K[i]], ...obj2[obj1K[i]] }
+    }
   }
+  return { ...obj2, ...obj1 }
 }
-
-/* 
-  func.apply(context, [iratebale]) => 返回运行结果
-  1. func => this 指向 context (this 原本是调用这个的对象)
-*/
-Function.prototype.myApply = function (context) {
-  if (typeof this !== 'function') throw new Error('type error')
-
-  context = context || window
-  context.fn = this // this 就是调用 myApply 的函数对象
-
-  const result = arguments[1] ? context.fn(...arguments[1]) : context.fn()
-
-  delete context.fn
-
-  return result
-}
+console.log(mergeObj(obj1, obj2))
