@@ -293,3 +293,53 @@ sayHi('jack')
 */
 
 // Reflect
+/* 
+Reflect 是一个内建对象，可简化 Proxy 的创建。
+
+前面所讲过的内部方法，例如 [[Get]] 和 [[Set]] 等，都只是规范性的，不能直接调用。
+
+Reflect 对象使调用这些内部方法成为了可能。它的方法是内部方法的最小包装。
+*/
+
+let man = {}
+Reflect.set(man, 'name', 'john')
+console.log(man.name)
+
+/* 
+尤其是，Reflect 允许我们将操作符（new，delete，……）作为函数（Reflect.construct，Reflect.deleteProperty，……）执行调用。这是一个有趣的功能，但是这里还有一点很重要。
+
+对于每个可被 Proxy 捕获的内部方法，在 Reflect 中都有一个对应的方法，其名称和参数与 Proxy 捕捉器相同。
+
+所以，我们可以使用 Reflect 来将操作转发给原始对象。
+
+在下面这个示例中，捕捉器 get 和 set 均透明地（好像它们都不存在一样）将读取/写入操作转发到对象，并显示一条消息：
+*/
+let woman = {
+  name: 'John',
+}
+
+woman = new Proxy(woman, {
+  get(target, prop, receiver) {
+    console.log(`GET ${prop}`)
+    return Reflect.get(target, prop, receiver) // (1)
+  },
+  set(target, prop, val, receiver) {
+    console.log(`SET ${prop}=${val}`)
+    return Reflect.set(target, prop, val, receiver) // (2)
+  },
+})
+
+let name = woman.name // 显示 "GET name"
+woman.name = 'Pete' // 显示 "SET name=Pete"
+
+/* 
+这里：
+
+Reflect.get 读取一个对象属性。
+Reflect.set 写入一个对象属性，如果写入成功则返回 true，否则返回 false。
+这样，一切都很简单：如果一个捕捉器想要将调用转发给对象，则只需使用相同的参数调用 Reflect.<method> 就足够了。
+
+在大多数情况下，我们可以不使用 Reflect 完成相同的事情，例如，用于读取属性的 Reflect.get(target, prop, receiver) 可以被替换为 target[prop]。尽管有一些细微的差别。
+*/
+
+// 代理一个 getter
