@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
 <html>
-<head>
-    <meta charset="UTF-8">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
 
-<body>
+  <body>
     <ul id="ul">
-        <li>1</li>
-        <li>2</li>
-        <li>3</li>
-        <li>4</li>
-        <li>5</li>
-        <li>6</li>
-        <li>7</li>
-        <li>8</li>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+      <li>6</li>
+      <li>7</li>
+      <li>8</li>
     </ul>
-</body>
-<script type="text/javascript">
-    const ul = document.querySelector("ul");
+  </body>
+  <script type="text/javascript">
+    const ul = document.querySelector('ul')
     ul.addEventListener('click', function (e) {
-        const target = e.target;
-        if (target.tagName.toLowerCase() === "li") {
-            const liList = this.querySelectorAll("li");
-            index = Array.prototype.indexOf.call(liList, target);
-            alert(`内容为${target.innerHTML}, 索引为${index}`);
-        }
+      const target = e.target
+      if (target.tagName.toLowerCase() === 'li') {
+        const liList = this.querySelectorAll('li')
+        index = Array.prototype.indexOf.call(liList, target)
+        alert(`内容为${target.innerHTML}, 索引为${index}`)
+      }
     })
-</script>
-
+  </script>
 </html>
