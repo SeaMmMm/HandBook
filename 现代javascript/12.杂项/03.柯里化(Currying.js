@@ -67,6 +67,64 @@ let logNow = log(new Date());
 
 // 使用它
 logNow("INFO", "message"); // [HH:mm] INFO message
+
 现在，logNow 是具有固定第一个参数的 log，换句话说，就是更简短的“部分应用函数（partially applied function）”或“部分函数（partial）”。
 
+我们可以更进一步，为当前的调试日志（debug log）提供便捷函数：
+let debugNow = logNow("DEBUG");
+debugNow("message"); // [HH:mm] DEBUG message
+*/
+
+/* 
+1. 柯里化之后，我们没有丢失任何东西：log 依然可以被正常调用。
+2. 我们可以轻松地生成部分应用函数，例如用于生成今天的日志的部分应用函数。
+*/
+
+// 高级柯里化实现
+function curry(func) {
+  return function curried(...args) {
+    if (args.length >= func.length) {
+      return func.apply(this, args)
+    } else {
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2))
+      }
+    }
+  }
+}
+
+/* 
+新的 curry 可能看上去有点复杂，但是它很容易理解。
+
+curry(func) 调用的结果是如下所示的包装器 curried：
+
+// func 是要转换的函数
+function curried(...args) {
+  if (args.length >= func.length) { // (1)
+    return func.apply(this, args);
+  } else {
+    return function(...args2) { // (2)
+      return curried.apply(this, args.concat(args2));
+    }
+  }
+};
+当我们运行它时，这里有两个 if 执行分支：
+
+1. 如果传入的 args 长度与原始函数所定义的（func.length）相同或者更长，那么只需要使用 func.apply 将调用传递给它即可。
+2. 否则，获取一个部分应用函数：我们目前还没调用 func。取而代之的是，返回另一个包装器 pass，它将重新应用 curried，将之前传入的参数与新的参数一起传入。
+
+然后，如果我们再次调用它，我们将得到一个新的部分应用函数（如果没有足够的参数），或者最终的结果。
+*/
+
+/* 
+只允许确定参数长度的函数
+柯里化要求函数具有固定数量的参数。
+使用 rest 参数的函数，例如 f(...args)，不能以这种方式进行柯里化。
+*/
+
+// 总结
+/* 
+柯里化 是一种转换，将 f(a,b,c) 转换为可以被以 f(a)(b)(c) 的形式进行调用。JavaScript 实现通常都保持该函数可以被正常调用，并且如果参数数量不足，则返回部分应用函数。
+
+柯里化让我们能够更容易地获取部分应用函数。就像我们在日志记录示例中看到的那样，普通函数 log(date, importance, message) 在被柯里化之后，当我们调用它的时候传入一个参数（如 log(date)）或两个参数（log(date, importance)）时，它会返回部分应用函数。
 */
