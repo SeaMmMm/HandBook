@@ -115,7 +115,7 @@ Object.freeze(obj3)
 obj3.zhaowa.score = 4.9
 // freeze只能冻结当前层
 function deepFreeze(obj) {
-  Object.freeze(obj)(Object.key(obj) || []).forEach((key) => {
+  Object.freeze(obj)(Object.keys(obj) || []).forEach((key) => {
     if (typeof obj[key] === 'object') {
       deepFreeze(obj[key])
     }
