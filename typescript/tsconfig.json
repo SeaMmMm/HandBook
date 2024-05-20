@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "outDir": "dist",
+    "rootDir": "src", // 用于指定源文件的根目录
+    "strict": true,
+    "esModuleInterop": true,
+    "sourceMap": true
+  },
+  "exclude": ["node_modules"]
+}
