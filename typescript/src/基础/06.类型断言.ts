@@ -51,3 +51,80 @@ function isApiError(error: Error) {
   }
   return false
 }
+
+// 在这个例子中有一个更合适的方式来判断是不是 ApiError，那就是使用 instanceof：
+function isApiError2(error: Error) {
+  if (error instanceof ApiError) {
+    return true
+  }
+  return false
+}
+
+// 但是有的情况下 ApiError 和 HttpError 不是一个真正的类，而只是一个 TypeScript 的接口（interface），接口是一个类型，不是一个真正的值，它在编译结果中会被删除，当然就无法使用 instanceof 来做运行时判断了
+interface ApiError2 extends Error {
+  code: number
+}
+interface HttpError2 extends Error {
+  statusCode: number
+}
+
+// 将 any 断言为一个具体的类型
+// 在日常的开发中，我们不可避免的需要处理 any 类型的变量，它们可能是由于第三方库未能定义好自己的类型，也有可能是历史遗留的或其他人编写的烂代码，还可能是受到 TypeScript 类型系统的限制而无法精确定义类型的场景。
+function getCacheData(key: string): any {
+  return (window as any).cache[key]
+}
+// 那么我们在使用它时，最好能够将调用了它之后的返回值断言成一个精确的类型
+interface Cat2 {
+  name: string
+  run(): void
+}
+const tom2 = getCacheData('tom') as Cat2
+tom2.run()
+
+// 类型断言的限制
+interface Animal {
+  name: string
+}
+interface Cat {
+  name: string
+  run(): void
+}
+
+let tom: Cat = {
+  name: 'Tom',
+  run: () => {
+    console.log('run')
+  },
+}
+let animal: Animal = tom
+
+// 类型断言 vs 类型转换
+// 类型断言只会影响 TypeScript 编译时的类型，类型断言语句在编译结果中会被删除
+function toBoolean(something: any): boolean {
+  return something as boolean
+}
+
+toBoolean(1) // return 1而不是true
+// 类型断言不是类型转换，它不会真的影响到变量的类型。
+// 若要进行类型转换，需要直接调用类型转换的方法：
+function toBoolean2(something: any): boolean {
+  return Boolean(something)
+}
+
+// 类型断言 vs 类型声明
+function getCacheData2(key: string): any {
+  return (window as any).cache[key]
+}
+
+interface Cat {
+  name: string
+  run(): void
+}
+
+const tom3 = getCacheData('tom') as Cat
+tom3.run()
+
+// 我们使用 as Cat 将 any 类型断言为了 Cat 类型。
+// 但实际上还有其他方式可以解决这个问题：
+const tom4: Cat = getCacheData('tom')
+tom4.run()
