@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>vue&#x57fa;&#x7840;&#x7528;&#x6cd5;</title>
+    <style>
+      /* From extension vscode.github */
+      /*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+      .vscode-dark img[src$='\#gh-light-mode-only'],
+      .vscode-light img[src$='\#gh-dark-mode-only'] {
+        display: none;
+      }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css"
+    />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui,
+          'Ubuntu', 'Droid Sans', sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+    </style>
+    <style>
+      .task-list-item {
+        list-style-type: none;
+      }
+
+      .task-list-item-checkbox {
+        margin-left: -20px;
+        vertical-align: middle;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body class="vscode-body vscode-light">
+    <h2 id="vue基础用法">vue基础用法</h2>
+    <h3 id="理论">理论</h3>
+    <h4 id="面试题1-简单聊聊对于mvvm的了解">面试题1: 简单聊聊对于MVVM的了解</h4>
+    <ul>
+      <li>
+        web应用发展史以及旁枝 a. 语义化模版 b. MVC - model view controller c. MVVM - model view
+        viewModel i. 数据本身会绑定在viewModel层，并且自动会把数据渲染到页面中 ii.
+        视图发生变化时候，会通知viewModel层
+      </li>
+    </ul>
+    <h3 id="写法">写法</h3>
+    <h4 id="vue式如何利用mvvm思想进行项目开发的呢">vue式如何利用mvvm思想进行项目开发的呢</h4>
+    <p>
+      数据双向绑定 a. 利用花括号，构筑了数据与vm的绑定关系 =&gt; buildTemplate b.
+      通过视图绑定事件，来处理数据 =&gt; v-model === :value @input =&gt; model :input @change
+    </p>
+    <pre><code class="language-js">    &lt;a-components v-model=<span class="hljs-string">&quot;data1&quot;</span> :value=<span class="hljs-string">&quot;data1&quot;</span> @input=<span class="hljs-string">&quot;handleInput&quot;</span>&gt;&lt;/a-components&gt;
+
+    <span class="hljs-comment">// a-components</span>
+    <span class="hljs-attr">model</span>: {
+        <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;input&#x27;</span>,
+    },
+    <span class="hljs-attr">props</span>: {
+        <span class="hljs-attr">value</span>: {
+            <span class="hljs-attr">type</span>: string,
+            <span class="hljs-attr">default</span>: <span class="hljs-string">&#x27;&#x27;</span>
+        }
+    },
+    <span class="hljs-attr">methods</span>: {
+        <span class="hljs-title function_">handleChangeData1</span>(<span class="hljs-params"></span>) {
+            <span class="hljs-variable language_">this</span>.$emit(<span class="hljs-string">&#x27;input&#x27;</span>, data1)
+        }
+    }
+</code></pre>
+    <p>buildTemplate =&gt; render()</p>
+    <p>h('div', {'class': 'data1'}, {}) =&gt; createElement</p>
+    <pre><code class="language-js">    <span class="hljs-title function_">render</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">return</span> (
+            <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&#x27;data1&#x27;</span>&gt;</span>{ this.data1 }<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+        )
+    }
+
+    &lt;template&gt;
+        <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&#x27;data1&#x27;</span>&gt;</span>{{ data1 }}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+    &lt;/template&gt;
+</code></pre>
+    <p>mergeOptions</p>
+    <h4 id="生命周期">生命周期</h4>
+    <h5 id="面试题vue生命周期">面试题：vue生命周期</h5>
+    <p>
+      创建阶段： beforeCreate =&gt; created =&gt; beforemount =&gt; mounted 更新阶段：
+      beforeUpdate =&gt; updated 销毁阶段： beforeDestroy =&gt; destroyed
+    </p>
+    <p>
+      bC: new Vue() - 实例创建阶段 c: data | props | method | computed - 数据操作 =&gt;
+      不涉及到vdom 和 dom
+    </p>
+    <p>bM：vDOM - 数据操作可以进行了，但是不可以涉及dom m：Dom - 任何操作</p>
+    <p>bU：vDOM完成了更新，dom旧的 u：dom已经更新了 - 谨慎更新数据操作</p>
+    <p>
+      bD：实例vm尚未被销毁 - 清空eventBus、reset store、clear 计时器 d: 实例已经被销毁 - 收尾
+    </p>
+    <h4 id="监听--条件--循环">监听 ｜ 条件 ｜ 循环</h4>
+    <h5 id="面试点-computed-和-watch">面试点： computed 和 watch</h5>
+    <p>相同点：</p>
+    <ol>
+      <li>基于vue的依赖收集机制进行采集</li>
+      <li>都是被依赖的变化所触发，进行改变进而进行处理计算</li>
+    </ol>
+    <p>不同点：</p>
+    <ol>
+      <li>
+        <p>
+          入和出 computed： 多入单出 - 多个值的变化，组成了一个值的最终改变 watch：单入多出 -
+          单个值的变化，进而影响一系列的状态变更
+        </p>
+      </li>
+      <li>
+        <p>性能 computed：缓存读取计算值 watch：监听值的变化一定会执行回调</p>
+      </li>
+      <li>
+        <p>写法上 computed 必须有返回值 watch 不一定</p>
+      </li>
+      <li>
+        <p>
+          时机上 computed 从首次生成赋值就开始计算了 watch 首次不会运行，除非 —— immediate:
+          true
+        </p>
+      </li>
+    </ol>
+    <h5 id="内置指令--自定义指令">内置指令 &amp; 自定义指令</h5>
+    <h6 id="条件">条件</h6>
+    <p>v-if | v-show v-else | v-else-if</p>
+    <p>v-for</p>
+    <h6 id="v-for--v-if">v-for &amp; v-if</h6>
+    <p>vue 2.x 在同一个元素上同时使用 v-for会优先作用 vue 3.x v-if总是优先于v-for生效</p>
+    <h6 id="v-model-v-once-v-text-v-html-v-bind-v-on">
+      v-model v-once v-text v-html v-bind v-on
+    </h6>
+    <h6 id="自定义">自定义</h6>
+    <pre><code class="language-js">    <span class="hljs-attr">directives</span>: {
+        <span class="hljs-attr">zhaowa</span>: {
+            <span class="hljs-attr">update</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+                <span class="hljs-comment">// ……</span>
+            }
+        }
+    }
+    <span class="hljs-comment">// v-zhaowa</span>
+    &lt;div v-zhaowa&gt;&lt;/div&gt;
+</code></pre>
+    <h4 id="事件---v-on">事件 - v-on</h4>
+    <h5 id="修饰符">修饰符</h5>
+    <p>.stop .prevent .capture .self .once .passive</p>
+    <h5 id="事件设计---为何vue把事件设计在模版上而不是js中">
+      事件设计 - 为何vue把事件设计在模版上而不是js中
+    </h5>
+    <ol>
+      <li>模版定位视图绑定触发源 + 触发源寻找触发事件逻辑 —— 更方便定位问题</li>
+      <li>js与视图绑定解耦 —— 更便于测试隔离</li>
+      <li>vm销毁，自动解绑事件 —— 便于回收</li>
+    </ol>
+    <h3 id="组件化">组件化</h3>
+    <h4 id="一般组件--动态组件">一般组件 + 动态组件</h4>
+    <pre><code class="language-js">    &lt;div&gt;
+        <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">a-component</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">a-component</span>&gt;</span></span>    
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">component</span> <span class="hljs-attr">:is</span>=<span class="hljs-string">&quot;compName&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">component</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+    data() {
+        compName: &#x27;a-component&#x27;
+    }
+</span></code></pre>
+
+    <script
+      async
+      src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"
+    ></script>
+  </body>
+</html>
