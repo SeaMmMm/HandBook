@@ -21,7 +21,7 @@ Promise.all([
 })
 
 // Promise.all(iterable) 允许在 iterable 中使用非 promise 的“常规”值
-/* 
+/*
 通常，Promise.all(...) 接受含有 promise 项的可迭代对象（大多数情况下是数组）作为参数。但是，如果这些对象中的任何一个不是 promise，那么它将被“按原样”传递给结果数组。
 
 例如，这里的结果是 [1, 2, 3]：
@@ -37,7 +37,7 @@ Promise.all([
 })
 
 // Promise.allSettled
-/* 
+/*
 Promise.allSettled 等待所有的 promise 都被 settle，无论结果如何。结果数组具有：
 
 - {status:"fulfilled", value:result} 对于成功的响应，
@@ -69,7 +69,7 @@ Promise.allSettled(urls.map((url) => fetch(url))).then((results) => {
 */
 
 // Promise.race
-/* 
+/*
 与 Promise.all 类似，但只等待第一个 settled 的 promise 并获取其结果（或 error）。
 
 语法：
@@ -87,7 +87,7 @@ Promise.race([
 })
 
 // Promise.any
-/* 
+/*
 与 Promise.race 类似，区别在于 Promise.any 只等待第一个 fulfilled 的 promise，并将这个 fulfilled 的 promise 返回。如果给出的 promise 都 rejected，那么返回的 promise 会带有 AggregateError —— 一个特殊的 error 对象，在其 errors 属性中存储着所有 promise error。
 
 语法如下：
@@ -119,7 +119,7 @@ Promise.any([
 })
 
 // Promise.resolve/reject
-/* 
+/*
 在现代的代码中，很少需要使用 Promise.resolve 和 Promise.reject 方法，因为 async/await 语法（我们会在 稍后 讲到）使它们变得有些过时了。
 
 完整起见，以及考虑到那些出于某些原因而无法使用 async/await 的人，我们在这里对它们进行介绍。
@@ -149,7 +149,7 @@ function loadCached(url) {
     })
 }
 
-/* 
+/*
 Promise.reject
 Promise.reject(error) 用 error 创建一个 rejected 的 promise。
 
@@ -160,7 +160,7 @@ let promise = new Promise((resolve, reject) => reject(error));
 */
 
 // 总结
-/* 
+/*
 Promise 类有 6 种静态方法：
 
 1. Promise.all(promises) —— 等待所有 promise 都 resolve 时，返回存放它们结果的数组。如果给定的任意一个 promise 为 reject，那么它就会变成 Promise.all 的 error，所有其他 promise 的结果都会被忽略。
